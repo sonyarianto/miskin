@@ -59,7 +59,7 @@ export default defineConfig({
 
     footer: {
       message: 'Released under the MIT License.',
-      copyright: 'Copyright © 2026 Sony AK',
+      copyright: 'Copyright © 2026 Miskin contributors',
     },
 
     editLink: {
