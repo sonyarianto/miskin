@@ -4,7 +4,7 @@ layout: home
 hero:
   name: "Miskin"
   text: "Save AI tokens."
-  tagline: Cut your AI coding costs. Same results, fewer tokens. Just one binary.
+  tagline: Cut your AI coding costs. Same results, fewer tokens.
   actions:
     - theme: brand
       text: Get Started
