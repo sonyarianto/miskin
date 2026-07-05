@@ -5,6 +5,7 @@
 [![npm](https://img.shields.io/npm/v/miskin.svg)](https://www.npmjs.com/package/miskin)
 [![npm downloads](https://img.shields.io/npm/dm/miskin.svg)](https://www.npmjs.com/package/miskin)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Sponsor](https://img.shields.io/badge/sponsor-%E2%9D%A4-pink.svg)](https://github.com/sponsors/sonyarianto)
 
 **Save AI tokens across providers.** Single Rust binary that compresses command output and injects caveman-mode prompts. Zero runtime dependencies, <10ms overhead.
 
