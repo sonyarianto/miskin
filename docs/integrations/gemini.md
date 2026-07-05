@@ -11,21 +11,42 @@ miskin init -g --agent gemini       # Global
 
 | File | Purpose |
 |------|---------|
-| `.gemini/miskin-hook.json` | BeforeTool hook configuration |
+| `.gemini/settings.json` | BeforeTool hook — calls wrapper script |
+| `.gemini/hooks/miskin-hook-gemini.sh` | Wrapper script that execs `miskin hook gemini` |
 | `GEMINI.md` | Caveman prompt |
 
 ## How the hook works
 
-Gemini CLI supports `beforeTool` hooks:
+A BeforeTool hook is registered in Gemini's `settings.json`:
 
 ```json
 {
   "hooks": {
-    "beforeTool": {
-      "bash": {
-        "rewrite": "miskin {command}"
-      }
-    }
+    "BeforeTool": [{
+      "matcher": "run_shell_command",
+      "hooks": [{
+        "type": "command",
+        "command": "/home/user/.gemini/hooks/miskin-hook-gemini.sh"
+      }]
+    }]
+  }
+}
+```
+
+The wrapper script simply execs the miskin binary:
+
+```bash
+#!/bin/bash
+exec miskin hook gemini
+```
+
+`miskin hook gemini` reads stdin JSON, extracts the command, and returns Gemini's protocol:
+
+```json
+{
+  "decision": "allow",
+  "hookSpecificOutput": {
+    "tool_input": { "command": "miskin docker ps" }
   }
 }
 ```

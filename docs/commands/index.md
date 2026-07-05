@@ -27,6 +27,10 @@ miskin <command> [args...]
 miskin init               # Install hooks
 miskin stats              # Token savings
 miskin gain               # Alias for stats
+miskin stats --graph      # Per-command bar chart
+miskin stats --history    # Recent command history
+miskin stats --daily      # Day-by-day breakdown
+miskin stats --json       # JSON export
 miskin config             # Manage configuration
 miskin compress           # Print caveman system prompt
 miskin discover           # Find unfiltered commands
@@ -34,6 +38,7 @@ miskin session            # Adoption by session
 miskin proxy <cmd>        # Raw passthrough + tracking
 miskin err <cmd>          # Show only stderr
 miskin completions bash   # Shell completions
+miskin hook <agent>       # Internal: hook protocol handler
 miskin --help             # Full help
 ```
 

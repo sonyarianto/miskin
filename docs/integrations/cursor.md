@@ -11,30 +11,31 @@ miskin init -g --agent cursor       # Global
 
 | File | Purpose |
 |------|---------|
-| `.cursor/hooks.json` | preToolUse hook configuration |
+| `.cursor/hooks.json` | preToolUse hook — calls `miskin hook cursor` |
 | `.cursorrules` | Caveman prompt |
 
 ## How the hook works
 
-Cursor's `hooks.json` supports a `preToolUse` hook that rewrites bash commands:
+Miskin registers in `hooks.json` under `preToolUse`:
 
 ```json
 {
   "hooks": {
-    "preToolUse": [
-      {
-        "matcher": "bash|execute_command",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "/bin/sh",
-            "args": ["-c", "echo \"miskin $CURSOR_TOOL_COMMAND\""],
-            "replaceToolArguments": true
-          }
-        ]
-      }
-    ]
+    "preToolUse": [{
+      "matcher": "Shell",
+      "command": "miskin hook cursor"
+    }]
   }
+}
+```
+
+`miskin hook cursor` reads stdin JSON, extracts the shell command, rewrites supported commands, and returns Cursor's protocol format:
+
+```json
+{
+  "continue": true,
+  "permission": "allow",
+  "updated_input": { "command": "miskin git status" }
 }
 ```
 

@@ -32,7 +32,7 @@ miskin init --agent gemini
 miskin init --agent codex
 miskin init --agent opencode
 
-# Restart your AI tool, then test
+# Restart your AI tool (some load hooks automatically), then test
 miskin git status          # 90% fewer tokens than raw git status
 ```
 

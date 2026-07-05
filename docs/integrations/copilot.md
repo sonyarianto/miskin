@@ -11,25 +11,33 @@ miskin init -g --agent copilot       # Global
 
 | File | Purpose |
 |------|---------|
-| `.github/copilot-hooks/miskin-hook.js` | preToolUse hook |
-| `.github/MISKIN.md` | Caveman prompt |
+| `.github/hooks/miskin-rewrite.json` | Hook config — calls `miskin hook copilot` |
+| `.github/copilot-instructions.md` | Caveman prompt |
+
+Global install uses `~/.copilot/hooks/` and `~/.copilot/copilot-instructions.md`.
 
 ## How the hook works
 
-```js
-module.exports = {
-  preToolUse: async (toolCall) => {
-    if (toolCall.name === 'execute_command' || toolCall.name === 'bash') {
-      const cmd = toolCall.arguments?.command || '';
-      const base = cmd.split(' ')[0];
-      if (['git', 'cargo', 'npm', ...].includes(base)) {
-        toolCall.arguments.command = `miskin ${cmd}`;
-      }
-    }
-    return toolCall;
+A JSON config file with both `PreToolUse` (VS Code) and `preToolUse` (CLI) entries:
+
+```json
+{
+  "version": 1,
+  "hooks": {
+    "PreToolUse": [{
+      "type": "command",
+      "command": "miskin hook copilot"
+    }],
+    "preToolUse": [{
+      "type": "command",
+      "bash": "miskin hook copilot",
+      "powershell": "miskin hook copilot"
+    }]
   }
-};
+}
 ```
+
+`miskin hook copilot` reads stdin JSON, extracts the command, rewrites supported commands to `miskin <cmd>`, and returns the appropriate JSON for either VS Code or CLI format.
 
 ## Enable Caveman Mode
 
@@ -37,11 +45,7 @@ module.exports = {
 miskin config set caveman.enabled true
 ```
 
-This writes caveman instructions to `.github/MISKIN.md`.
-
-## Limitations
-
-Copilot's VS Code extension has limited hook support compared to Claude Code. The CLI version (`gh copilot`) has better hook support.
+Writes to `copilot-instructions.md`.
 
 ## Uninstall
 
