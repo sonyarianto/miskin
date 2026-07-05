@@ -3,6 +3,7 @@ pub mod curl;
 pub mod docker;
 pub mod files;
 pub mod generic;
+pub mod gh;
 pub mod git;
 pub mod lint;
 pub mod npm;
@@ -71,6 +72,7 @@ impl Default for FilterRegistry {
     fn default() -> Self {
         let mut registry = Self::new();
         registry.register(Box::new(git::GitFilter));
+        registry.register(Box::new(gh::GhFilter));
         registry.register(Box::new(cargo::CargoFilter));
         registry.register(Box::new(docker::DockerFilter));
         registry.register(Box::new(files::FilesFilter));

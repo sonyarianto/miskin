@@ -62,7 +62,10 @@ async fn main() -> anyhow::Result<()> {
 }
 
 async fn run_passthrough(args: &[String], ultra_compact: bool) -> anyhow::Result<()> {
+    use tokio::io::AsyncReadExt;
     use tokio::process::Command;
+    use tokio::io::AsyncWriteExt;
+
     let config = config::MiskinConfig::load()?;
     let command_name = &args[0];
     let subcommand_args = &args[1..];
@@ -77,15 +80,48 @@ async fn run_passthrough(args: &[String], ultra_compact: bool) -> anyhow::Result
         std::process::exit(status.code().unwrap_or(1));
     }
 
-    let output = Command::new(command_name)
+    let mut child = Command::new(command_name)
         .args(subcommand_args)
-        .output()
-        .await?;
+        .stdout(std::process::Stdio::piped())
+        .stderr(std::process::Stdio::piped())
+        .spawn()?;
 
-    let stdout = String::from_utf8_lossy(&output.stdout).to_string();
-    let stderr = String::from_utf8_lossy(&output.stderr).to_string();
+    let mut child_stdout = child.stdout.take().expect("stdout not piped");
+    let mut child_stderr = child.stderr.take().expect("stderr not piped");
+
+    let stdout_task = {
+        let mut buf = Vec::new();
+        async move {
+            child_stdout.read_to_end(&mut buf).await?;
+            Ok::<Vec<u8>, std::io::Error>(buf)
+        }
+    };
+
+    let stderr_task = {
+        let mut buf = Vec::new();
+        async move {
+            let mut chunk = [0u8; 8192];
+            loop {
+                let n = child_stderr.read(&mut chunk).await?;
+                if n == 0 {
+                    break;
+                }
+                buf.extend_from_slice(&chunk[..n]);
+                let _ = tokio::io::stderr().write_all(&chunk[..n]).await;
+            }
+            Ok::<Vec<u8>, std::io::Error>(buf)
+        }
+    };
+
+    let (stdout_result, stderr_result, status) = tokio::join!(stdout_task, stderr_task, child.wait());
+
+    let stdout_buf = stdout_result?;
+    let stderr_buf = stderr_result?;
+    let exit_code = status?.code();
+
+    let stdout = String::from_utf8_lossy(&stdout_buf).to_string();
+    let stderr = String::from_utf8_lossy(&stderr_buf).to_string();
     let full_output = format!("{}{}", stdout, stderr);
-    let exit_code = output.status.code();
 
     let registry = filters::FilterRegistry::default();
     let original_tokens = analytics::counter::count_tokens(&full_output);
