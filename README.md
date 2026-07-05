@@ -7,7 +7,7 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Sponsor](https://img.shields.io/badge/sponsor-%E2%9D%A4-pink.svg)](https://github.com/sponsors/sonyarianto)
 
-**Save AI tokens across providers.** Single Rust binary that compresses command output and injects caveman-mode prompts. Zero runtime dependencies, <10ms overhead.
+**Save AI tokens across providers.** Local. No server. Compresses command output + injects caveman-mode prompts.
 
 ```
 Without Miskin:                     With Miskin:

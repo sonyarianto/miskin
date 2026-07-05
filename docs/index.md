@@ -4,7 +4,7 @@ layout: home
 hero:
   name: "Miskin"
   text: "Save AI tokens."
-  tagline: Cut your AI coding costs. Same results, fewer tokens.
+  tagline: Local. No server. Compresses command output + injects caveman-mode prompts.
   actions:
     - theme: brand
       text: Get Started
