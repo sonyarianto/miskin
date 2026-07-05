@@ -31,6 +31,7 @@ async fn main() -> anyhow::Result<()> {
                 args.hook_only,
                 args.auto_patch,
                 args.show,
+                args.dry_run,
             )?,
             Commands::Stats(args) => {
                 cli::stats::run(args.graph, args.history, args.daily, args.all, args.json)?
@@ -126,6 +127,7 @@ async fn run_passthrough(args: &[String], ultra_compact: bool) -> anyhow::Result
     let registry = filters::FilterRegistry::default();
     let original_tokens = analytics::counter::count_tokens(&full_output);
 
+    let mut generic_truncated = false;
     let filtered = if let Some(filter) = registry.get(command_name) {
         match filter.filter(subcommand_args, &full_output, exit_code) {
             filters::FilterResult::Filtered(s) => s,
@@ -145,6 +147,8 @@ async fn run_passthrough(args: &[String], ultra_compact: bool) -> anyhow::Result
         }
     } else {
         let max = config.filters.max_lines;
+        let line_count = full_output.lines().count();
+        generic_truncated = line_count > max;
         if config.filters.deduplicate {
             filters::generic::deduplicate_lines(&filters::generic::truncate_lines(
                 &full_output,
@@ -163,7 +167,8 @@ async fn run_passthrough(args: &[String], ultra_compact: bool) -> anyhow::Result
 
     let filtered_tokens = analytics::counter::count_tokens(&final_output);
 
-    if (exit_code != Some(0) || !stderr.is_empty())
+    let should_tee = exit_code != Some(0) || !stderr.is_empty() || generic_truncated;
+    if should_tee
         && let Ok(tee_path) =
             tee::save_raw(&config.analytics.data_dir, &args.join(" "), &full_output)
     {

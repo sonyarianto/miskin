@@ -82,7 +82,7 @@ impl Default for GeneralConfig {
 impl Default for FiltersConfig {
     fn default() -> Self {
         Self {
-            max_lines: 200,
+            max_lines: 500,
             strip_comments: false,
             deduplicate: true,
         }

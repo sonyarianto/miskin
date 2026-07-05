@@ -87,6 +87,10 @@ pub struct InitArgs {
     /// Verify installation
     #[arg(long)]
     pub show: bool,
+
+    /// Print what would be installed without writing anything
+    #[arg(long)]
+    pub dry_run: bool,
 }
 
 // ── Stats ───────────────────────────────────────────────────────────

@@ -11,9 +11,15 @@ pub fn run(
     hook_only: bool,
     auto_patch: bool,
     show: bool,
+    dry_run: bool,
 ) -> anyhow::Result<()> {
     if show {
         verify_installation(agent, global)?;
+        return Ok(());
+    }
+
+    if dry_run {
+        dry_run_preview(agent, global, hook_only)?;
         return Ok(());
     }
 
@@ -117,5 +123,32 @@ fn install_prompt_injection(agent: &str, global: bool) -> anyhow::Result<()> {
         println!("  Installed prompt: {}", path.display());
     }
 
+    Ok(())
+}
+
+fn dry_run_preview(agent: &str, global: bool, hook_only: bool) -> anyhow::Result<()> {
+    let hook_paths = hooks::paths_for_agent(agent, global);
+    let prompt_paths = if hook_only {
+        vec![]
+    } else {
+        hooks::prompt_paths_for_agent(agent, global)
+    };
+
+    println!(
+        "Would install for {} ({}):\n",
+        agent,
+        if global { "global" } else { "local" }
+    );
+    println!("  Hook files:");
+    for p in &hook_paths {
+        println!("    {}", p.display());
+    }
+    if !prompt_paths.is_empty() {
+        println!("  Prompt files:");
+        for p in &prompt_paths {
+            println!("    {}", p.display());
+        }
+    }
+    println!("\nNo changes made (--dry-run).");
     Ok(())
 }
