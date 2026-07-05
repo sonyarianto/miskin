@@ -36,7 +36,13 @@ fn filter_ls(output: &str) -> String {
 
     if lines
         .first()
-        .map(|l| l.contains('/') || l.contains("total "))
+        .map(|l| {
+            l.contains('/')
+                || l.starts_with("total ")
+                || l.starts_with('d')
+                || l.starts_with('-')
+                || l.starts_with('l')
+        })
         .unwrap_or(false)
     {
         let mut dirs = Vec::new();
@@ -45,7 +51,7 @@ fn filter_ls(output: &str) -> String {
 
         for line in &lines {
             let trimmed = line.trim();
-            if trimmed.ends_with('/') || trimmed.ends_with('/') {
+            if trimmed.ends_with('/') {
                 dirs.push(trimmed.to_string());
             } else if trimmed.contains('.') {
                 files.push(trimmed.to_string());

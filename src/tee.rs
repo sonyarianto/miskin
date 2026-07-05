@@ -8,7 +8,12 @@ pub fn save_raw(
     let tee_dir = data_dir.join("tee");
     std::fs::create_dir_all(&tee_dir)?;
 
-    let timestamp = chrono::Utc::now().format("%Y%m%d_%H%M%S");
+    let now = chrono::Utc::now();
+    let timestamp = format!(
+        "{}{:03}",
+        now.format("%Y%m%d_%H%M%S"),
+        now.timestamp_subsec_millis()
+    );
     let safe_name = command
         .replace([' ', '/', '\\'], "_")
         .chars()

@@ -61,6 +61,23 @@ impl std::fmt::Display for CavemanLevel {
     }
 }
 
+impl std::str::FromStr for CavemanLevel {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s.to_lowercase().as_str() {
+            "lite" => Ok(CavemanLevel::Lite),
+            "full" => Ok(CavemanLevel::Full),
+            "ultra" => Ok(CavemanLevel::Ultra),
+            "aggressive" => Ok(CavemanLevel::Aggressive),
+            other => Err(format!(
+                "invalid caveman level '{}'. Expected one of: lite, full, ultra, aggressive",
+                other
+            )),
+        }
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AnalyticsConfig {
     #[serde(default = "default_true")]

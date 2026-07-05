@@ -1,11 +1,13 @@
+use std::sync::OnceLock;
 use tiktoken_rs::cl100k_base;
 
+fn bpe() -> &'static tiktoken_rs::CoreBPE {
+    static BPE: OnceLock<tiktoken_rs::CoreBPE> = OnceLock::new();
+    BPE.get_or_init(|| cl100k_base().expect("failed to load cl100k_base tokenizer"))
+}
+
 pub fn count_tokens(text: &str) -> usize {
-    if let Ok(bpe) = cl100k_base() {
-        bpe.encode_ordinary(text).len()
-    } else {
-        text.split_whitespace().count() * 100 / 75
-    }
+    bpe().encode_ordinary(text).len()
 }
 
 #[allow(dead_code)]

@@ -44,23 +44,28 @@ fn filter_install(output: &str, exit_code: Option<i32>) -> String {
         .copied()
         .collect();
 
+    let mut parts: Vec<String> = Vec::new();
     for line in &added {
-        let trimmed = line.trim();
+        let trimmed = line.trim().to_string();
         if !trimmed.is_empty() {
-            return trimmed.to_string();
+            parts.push(trimmed);
         }
     }
     for line in &removed {
-        let trimmed = line.trim();
+        let trimmed = line.trim().to_string();
         if !trimmed.is_empty() {
-            return trimmed.to_string();
+            parts.push(trimmed);
         }
     }
     for line in &changed {
-        let trimmed = line.trim();
+        let trimmed = line.trim().to_string();
         if !trimmed.is_empty() {
-            return trimmed.to_string();
+            parts.push(trimmed);
         }
+    }
+
+    if !parts.is_empty() {
+        return parts.join(", ");
     }
 
     if exit_code == Some(0) {

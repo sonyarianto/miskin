@@ -102,10 +102,11 @@ fn verify_installation(agent: &str, global: bool) -> anyhow::Result<()> {
 }
 
 fn install_prompt_injection(agent: &str, global: bool) -> anyhow::Result<()> {
-    use crate::config::CavemanLevel;
+    use crate::config::MiskinConfig;
     use crate::prompt;
 
-    let prompt = prompt::caveman_system_prompt(&CavemanLevel::Full);
+    let config = MiskinConfig::load()?;
+    let prompt = prompt::caveman_system_prompt(&config.caveman.level);
 
     let prompt_file_content = format!(
         "# MISKIN ACTIVE\n\n{}\n\n**Commands automatically rewritten**: \

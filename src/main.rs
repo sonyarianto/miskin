@@ -15,7 +15,7 @@ async fn main() -> anyhow::Result<()> {
     let cli = cli::Cli::parse();
 
     let env_filter = match cli.verbose {
-        0 => EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new("warn")),
+        0 => EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new("error")),
         1 => EnvFilter::new("info"),
         2 => EnvFilter::new("debug"),
         _ => EnvFilter::new("trace"),
@@ -47,6 +47,7 @@ async fn main() -> anyhow::Result<()> {
             Commands::Proxy(args) => run_proxy(&args.command).await?,
             Commands::Err(args) => run_err(&args.command).await?,
             Commands::Completions(args) => run_completions(args)?,
+            Commands::Hook(args) => cli::hook::run(&args.agent)?,
         }
     } else if !cli.passthrough.is_empty() {
         run_passthrough(&cli.passthrough, cli.ultra_compact).await?;
@@ -140,7 +141,7 @@ async fn run_passthrough(args: &[String], ultra_compact: bool) -> anyhow::Result
             .map(|s| s.as_str())
             .unwrap_or(command_name),
     ) {
-        match filter.filter(&subcommand_args[1..], &full_output, exit_code) {
+        match filter.filter(subcommand_args, &full_output, exit_code) {
             filters::FilterResult::Filtered(s) => s,
             filters::FilterResult::PassThrough(s) => s,
             filters::FilterResult::Silent => String::new(),
@@ -264,10 +265,16 @@ fn ultra_compact_format(input: &str) -> String {
         .map(|l| l.trim())
         .filter(|l| !l.is_empty())
         .map(|l| {
-            l.replace("pass", "✓")
-                .replace("fail", "✗")
-                .replace("PASS", "✓")
-                .replace("FAIL", "✗")
+            l.split_whitespace()
+                .map(|w| match w {
+                    "pass" => "✓",
+                    "fail" => "✗",
+                    "PASS" => "✓",
+                    "FAIL" => "✗",
+                    _ => w,
+                })
+                .collect::<Vec<_>>()
+                .join(" ")
         })
         .collect::<Vec<_>>()
         .join("\n")

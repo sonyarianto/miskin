@@ -36,8 +36,10 @@ impl AnalyticsStore {
     pub fn save(&self, data_dir: &std::path::Path) -> anyhow::Result<()> {
         std::fs::create_dir_all(data_dir)?;
         let path = data_dir.join("analytics.json");
+        let tmp = data_dir.join(".analytics.json.tmp");
         let content = serde_json::to_string_pretty(self)?;
-        std::fs::write(&path, content)?;
+        std::fs::write(&tmp, content)?;
+        std::fs::rename(&tmp, &path)?;
         Ok(())
     }
 
@@ -53,7 +55,12 @@ impl AnalyticsStore {
         self.command_count += 1;
 
         if self.entries.len() > 10000 {
-            self.entries.drain(0..1000);
+            let drained: Vec<_> = self.entries.drain(0..1000).collect();
+            for entry in &drained {
+                self.total_original -= entry.original_tokens;
+                self.total_filtered -= entry.filtered_tokens;
+                self.command_count -= 1;
+            }
         }
     }
 

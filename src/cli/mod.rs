@@ -1,5 +1,6 @@
 pub mod config_cmd;
 pub mod discover;
+pub mod hook;
 pub mod init;
 pub mod session;
 pub mod stats;
@@ -41,7 +42,7 @@ pub enum Commands {
     /// Show or edit configuration
     Config(ConfigArgs),
 
-    /// Compress text from stdin (caveman-mode prompt)
+    /// Print the caveman system prompt
     Compress,
 
     /// Find missed savings opportunities (commands not yet filtered)
@@ -58,6 +59,10 @@ pub enum Commands {
 
     /// Generate shell completions (bash, zsh, fish)
     Completions(CompletionsArgs),
+
+    /// Internal hook handler (called by AI tool hook systems)
+    #[command(hide = true)]
+    Hook(HookArgs),
 }
 
 // ── Init ────────────────────────────────────────────────────────────
@@ -185,4 +190,13 @@ pub struct CompletionsArgs {
     /// Shell to generate completions for
     #[arg(value_enum)]
     pub shell: clap_complete::Shell,
+}
+
+// ── Hook ───────────────────────────────────────────────────────────
+
+#[derive(clap::Args)]
+pub struct HookArgs {
+    /// Agent to handle hook for
+    #[arg(value_enum)]
+    pub agent: String,
 }

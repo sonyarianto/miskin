@@ -24,15 +24,27 @@ pub fn set(key: &str, value: &str) -> anyhow::Result<()> {
         "caveman.level" => {
             config.caveman.level = serde_json::from_str(&format!("\"{}\"", value))?;
         }
+        "general.enabled" => {
+            config.general.enabled = value.parse()?;
+        }
         "general.ultra_compact" => {
             config.general.ultra_compact = value.parse()?;
+        }
+        "analytics.enabled" => {
+            config.analytics.enabled = value.parse()?;
+        }
+        "filters.deduplicate" => {
+            config.filters.deduplicate = value.parse()?;
+        }
+        "filters.strip_comments" => {
+            config.filters.strip_comments = value.parse()?;
         }
         "filters.max_lines" => {
             config.filters.max_lines = value.parse()?;
         }
         _ => {
             anyhow::bail!(
-                "Unknown config key '{}'. Available: caveman.enabled, caveman.level, general.ultra_compact, filters.max_lines",
+                "Unknown config key '{}'. Available: caveman.enabled, caveman.level, general.enabled, general.ultra_compact, analytics.enabled, filters.deduplicate, filters.strip_comments, filters.max_lines",
                 key
             );
         }

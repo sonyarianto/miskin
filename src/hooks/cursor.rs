@@ -1,39 +1,22 @@
+use super::{merge_json_or_create, remove_hook_from_config};
 use std::path::PathBuf;
 
 pub fn install(global: bool) -> anyhow::Result<()> {
-    let content = r#"{
-  "hooks": {
-    "preToolUse": [
-      {
-        "matcher": "bash|execute_command",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "/bin/sh",
-            "args": ["-c", "echo \"miskin $CURSOR_TOOL_COMMAND\""],
-            "replaceToolArguments": true
-          }
-        ]
-      }
-    ]
-  }
-}
-"#;
-
     let path = if global {
         dirs::home_dir()
             .unwrap_or_else(|| PathBuf::from("."))
-            .join(".cursor")
-            .join("hooks.json")
+            .join(".cursor/hooks.json")
     } else {
-        PathBuf::from(".cursor").join("hooks.json")
+        PathBuf::from(".cursor/hooks.json")
     };
 
-    if let Some(parent) = path.parent() {
-        std::fs::create_dir_all(parent)?;
-    }
-    std::fs::write(&path, content)?;
-    println!("  Installed hook: {}", path.display());
+    let entry = serde_json::json!({
+        "matcher": "Shell",
+        "command": "miskin hook cursor"
+    });
+
+    merge_json_or_create(&path, "preToolUse", &entry)?;
+    println!("  Registered hook: {}", path.display());
     Ok(())
 }
 
@@ -41,14 +24,12 @@ pub fn uninstall(global: bool) -> anyhow::Result<()> {
     let path = if global {
         dirs::home_dir()
             .unwrap_or_else(|| PathBuf::from("."))
-            .join(".cursor")
-            .join("hooks.json")
+            .join(".cursor/hooks.json")
     } else {
-        PathBuf::from(".cursor").join("hooks.json")
+        PathBuf::from(".cursor/hooks.json")
     };
-    if path.exists() {
-        std::fs::remove_file(&path)?;
-        println!("  Removed: {}", path.display());
-    }
+
+    remove_hook_from_config(&path, "preToolUse", "miskin hook cursor")?;
+    println!("  Removed hook from: {}", path.display());
     Ok(())
 }

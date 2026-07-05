@@ -1,4 +1,5 @@
 use std::collections::{HashMap, HashSet};
+use std::sync::OnceLock;
 
 pub fn deduplicate_lines(input: &str) -> String {
     let mut seen = HashSet::new();
@@ -32,9 +33,13 @@ pub fn truncate_lines(input: &str, max_lines: usize) -> String {
     )
 }
 
+fn ansi_regex() -> &'static regex::Regex {
+    static RE: OnceLock<regex::Regex> = OnceLock::new();
+    RE.get_or_init(|| regex::Regex::new("\x1b\\[[0-9;]*[a-zA-Z]").unwrap())
+}
+
 pub fn strip_ansi(input: &str) -> String {
-    let re = regex::Regex::new("\x1b\\[[0-9;]*[a-zA-Z]").unwrap();
-    re.replace_all(input, "").to_string()
+    ansi_regex().replace_all(input, "").to_string()
 }
 
 #[allow(dead_code)]
@@ -165,5 +170,13 @@ mod unit_tests {
         let r = group_by_common_prefix(&paths);
         assert!(r.contains("src") && r.contains("4 files") || r.contains("src/a.rs"));
         assert!(r.contains("e.rs"));
+    }
+
+    #[test]
+    fn dedup_preserves_empty_lines() {
+        let input = "line1\n\nline1\n\nline2\n\nline2";
+        let r = deduplicate_lines(input);
+        assert_eq!(r, "line1\n\n\nline2\n");
+        assert!(r.contains("\n\n"));
     }
 }

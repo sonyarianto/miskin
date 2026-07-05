@@ -9,12 +9,6 @@ pub fn caveman_system_prompt(level: &CavemanLevel) -> &'static str {
     }
 }
 
-#[allow(dead_code)]
-pub fn inject_into_prompt(existing: &str, level: &CavemanLevel) -> String {
-    let cave = caveman_system_prompt(level);
-    format!("{}\n\n---\n\n{}", existing, cave)
-}
-
 const CAVEMAN_LITE: &str = r#"
 RULES FOR RESPONDING:
 - Be concise. No fluff, no pleasantries, no hedging.
