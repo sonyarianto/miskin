@@ -1,0 +1,84 @@
+const os = require("os");
+const fs = require("fs");
+const path = require("path");
+const https = require("https");
+
+const VERSION = "0.1.0";
+const BIN_DIR = path.join(__dirname, "bin");
+
+function getBinaryName() {
+  const platform = os.platform();
+  const arch = os.arch();
+
+  const map = {
+    "linux-x64": "miskin-linux-x64",
+    "linux-arm64": "miskin-linux-arm64",
+    "darwin-x64": "miskin-macos-x64",
+    "darwin-arm64": "miskin-macos-arm64",
+    "win32-x64": "miskin-windows-x64.exe",
+  };
+
+  const key = `${platform}-${arch}`;
+  const name = map[key];
+  if (!name) {
+    console.error(`Unsupported platform: ${platform}-${arch}`);
+    console.error("Install from source: cargo install --git https://github.com/sonyarianto/miskin");
+    process.exit(1);
+  }
+  return name;
+}
+
+function download(url, dest) {
+  return new Promise((resolve, reject) => {
+    const file = fs.createWriteStream(dest);
+    https
+      .get(url, (response) => {
+        if (response.statusCode === 302 || response.statusCode === 301) {
+          https.get(response.headers.location, (res) => {
+            res.pipe(file);
+            file.on("finish", () => {
+              file.close();
+              resolve();
+            });
+          });
+        } else {
+          response.pipe(file);
+          file.on("finish", () => {
+            file.close();
+            resolve();
+          });
+        }
+      })
+      .on("error", (err) => {
+        fs.unlink(dest, () => {});
+        reject(err);
+      });
+  });
+}
+
+async function main() {
+  const binaryName = getBinaryName();
+  const dest = path.join(BIN_DIR, os.platform() === "win32" ? "miskin.exe" : "miskin");
+  const url = `https://github.com/sonyarianto/miskin/releases/download/v${VERSION}/${binaryName}`;
+
+  if (!fs.existsSync(BIN_DIR)) {
+    fs.mkdirSync(BIN_DIR, { recursive: true });
+  }
+
+  console.log(`Downloading miskin v${VERSION} for ${os.platform()}-${os.arch()}...`);
+
+  try {
+    await download(url, dest);
+    if (os.platform() !== "win32") {
+      fs.chmodSync(dest, "755");
+    }
+    console.log("miskin installed successfully");
+  } catch (e) {
+    console.error(`Failed to download binary: ${e.message}`);
+    console.error(`URL: ${url}`);
+    console.error("Install from source: cargo install --git https://github.com/sonyarianto/miskin");
+    process.exit(1);
+  }
+}
+
+main();

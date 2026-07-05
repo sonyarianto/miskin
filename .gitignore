@@ -10,3 +10,5 @@
 docs/node_modules/
 docs/.vitepress/dist/
 docs/.vitepress/cache/
+packages/npm/bin/miskin
+packages/npm/bin/miskin.exe
