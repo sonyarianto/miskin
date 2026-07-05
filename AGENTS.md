@@ -93,35 +93,3 @@ CI will publish to:
 4. Add docs page under `docs/commands/`
 5. Add to sidebar in `docs/.vitepress/config.mts`
 6. Run `cargo fmt --all` and `cargo test`
-
-## Known Issues & TODO
-
-### v0.1.3 Release Status
-- [ ] Verify `miskin` published on crates.io
-- [ ] Verify `miskin` published on npm
-- [ ] Verify GitHub Release has all 5 platform binaries
-
-### End-to-End Testing (not done)
-- [ ] Test `miskin init` + real Claude Code session
-- [ ] Test `miskin init --agent opencode` + real OpenCode session
-- [ ] Test `miskin init --agent cursor` + real Cursor session
-- [ ] Test `miskin init --agent copilot` + real Copilot session
-- [ ] Test `miskin init --agent gemini` + real Gemini CLI session
-- [ ] Test `miskin init --agent codex` + real Codex session
-- [ ] Test `miskin init --agent windsurf` + real Windsurf session
-
-### RTK Conflict
-- Miskin and RTK hooks both rewrite the same commands (e.g., `git status` → `miskin rtk git status`)
-- Cannot run both simultaneously. Must uninstall one before testing the other.
-
-### CI Cross-Compilation
-- `aarch64-unknown-linux-gnu` needs `gcc-aarch64-linux-gnu` + `CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER`
-- May need additional testing on actual arm64 hardware
-
-### Future
-- [ ] Homebrew formula (`brew install miskin`)
-- [ ] AWS filter (sts, ec2, lambda, logs, s3)
-- [ ] GH Actions integration test workflow
-- [ ] Hook e2e tests (spawn agent, verify hook rewrites commands)
-- [ ] Windows: test .exe wrapper, add .cmd file for npm
-- [ ] Windows: hook via registry or compatible mechanism
