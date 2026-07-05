@@ -42,4 +42,6 @@ miskin init --agent cursor --uninstall
 - [GitHub Copilot](/integrations/copilot)
 - [Cursor](/integrations/cursor)
 - [Gemini CLI](/integrations/gemini)
+- [Codex](/integrations/codex)
 - [OpenCode](/integrations/opencode)
+- [Windsurf](/integrations/windsurf)

@@ -1,6 +1,6 @@
 # Miskin
 
-**Save AI tokens across providers.** Single Rust binary that compresses command output and injects caveman-mode prompts. Zero dependencies, <10ms overhead.
+**Save AI tokens across providers.** Single Rust binary that compresses command output and injects caveman-mode prompts. Zero runtime dependencies, <10ms overhead.
 
 ```
 Without Miskin:                     With Miskin:
@@ -135,6 +135,7 @@ miskin completions fish > ~/.config/fish/completions/miskin.fish
 | **Linting** | eslint, ruff, biome, tsc, mypy, prettier, golangci-lint, rubocop, clippy |
 | **Docker/K8s** | docker ps, images, logs, compose; kubectl, oc |
 | **Files** | ls, cat, find, tree, head, tail, read |
+| **GitHub CLI** | gh pr list/view/status, issue list, run list, repo view, auth |
 | **Network** | curl, wget |
 | **System** | df, du, ps, top, wc, env, which, uname, free |
 
@@ -183,7 +184,7 @@ ultra_compact = false
 exclude_commands = ["curl"]  # Skip filtering for these
 
 [filters]
-max_lines = 200
+max_lines = 500
 deduplicate = true
 
 [caveman]

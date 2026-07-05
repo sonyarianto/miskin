@@ -28,7 +28,7 @@ features:
     details: Track token savings per command, per session, per day. ASCII graphs, JSON export. No telemetry, all local.
   - icon: 🦀
     title: Rust
-    details: Single 7.5MB binary. Zero runtime dependencies. <10ms overhead. Cross-platform Linux/macOS/Windows.
+    details: Single ~7MB binary. Zero runtime dependencies. <10ms overhead. Cross-platform Linux/macOS/Windows.
   - icon: 🔒
     title: Privacy First
     details: No telemetry. No accounts. No network calls. Everything stays on your machine.

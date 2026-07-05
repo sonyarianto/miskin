@@ -11,7 +11,7 @@ ultra_compact = false
 exclude_commands = ["curl", "wget"]
 
 [filters]
-max_lines = 200
+max_lines = 500
 strip_comments = false
 deduplicate = true
 
@@ -36,7 +36,7 @@ data_dir = "/home/user/.local/share/miskin"
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| `max_lines` | number | `200` | Max lines before truncation for unrecognized commands |
+| `max_lines` | number | `500` | Max lines before truncation for unrecognized commands |
 | `strip_comments` | bool | `false` | Strip code comments from output |
 | `deduplicate` | bool | `true` | Remove duplicate output lines |
 

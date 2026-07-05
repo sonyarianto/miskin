@@ -87,9 +87,21 @@ echo 'eval "$(miskin completions zsh)"' >> ~/.zshrc
 miskin completions fish > ~/.config/fish/completions/miskin.fish
 ```
 
+## Dry Run
+
+Preview what would be installed without writing anything:
+
+```bash
+miskin init --dry-run
+miskin init --dry-run --agent cursor
+miskin init --dry-run --hook-only
+```
+
 ## Uninstall
 
 ```bash
 miskin init --uninstall
+miskin init --agent cursor --uninstall
 cargo uninstall miskin
+npm uninstall -g miskin
 ```
