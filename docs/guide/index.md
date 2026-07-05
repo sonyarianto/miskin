@@ -7,7 +7,7 @@ Miskin is a CLI proxy that sits between your AI coding tool and your shell, comp
 ### Cargo (recommended)
 
 ```bash
-cargo install --git https://github.com/sonyarianto/miskin
+cargo install miskin
 ```
 
 ### From source

@@ -11,6 +11,8 @@ Downloads the pre-built binary for your platform. No Rust required.
 ## Cargo
 
 ```bash
+cargo install miskin
+# or from source:
 cargo install --git https://github.com/sonyarianto/miskin
 ```
 

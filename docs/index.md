@@ -38,7 +38,7 @@ features:
 
 ```bash
 # Install
-cargo install --git https://github.com/sonyarianto/miskin
+cargo install miskin
 
 # Set up hooks for your AI tool
 miskin init               # Claude Code
