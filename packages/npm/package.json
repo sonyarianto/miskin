@@ -1,6 +1,6 @@
 {
   "name": "miskin",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Save AI tokens. Compress command output + caveman prompts. Single Rust binary.",
   "license": "MIT",
   "repository": {
