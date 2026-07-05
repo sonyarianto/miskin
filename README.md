@@ -91,16 +91,22 @@ miskin completions bash  # Generate shell completions
 
 ## Installation
 
+### npm (recommended)
+
+```bash
+npm install -g miskin
+```
+
 ### Cargo
 
 ```bash
-cargo install --git https://github.com/sony/miskin
+cargo install --git https://github.com/sonyarianto/miskin
 ```
 
 ### From source
 
 ```bash
-git clone https://github.com/sony/miskin
+git clone https://github.com/sonyarianto/miskin
 cd miskin
 cargo install --path .
 ```

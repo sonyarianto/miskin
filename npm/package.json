@@ -1,0 +1,32 @@
+{
+  "name": "miskin",
+  "version": "0.1.0",
+  "description": "Save AI tokens. Compress command output + caveman prompts. Single Rust binary.",
+  "license": "MIT",
+  "repository": "github:sonyarianto/miskin",
+  "homepage": "https://github.com/sonyarianto/miskin",
+  "bin": {
+    "miskin": "cli.js"
+  },
+  "scripts": {
+    "postinstall": "node install.js"
+  },
+  "files": [
+    "cli.js",
+    "install.js"
+  ],
+  "keywords": [
+    "ai",
+    "llm",
+    "tokens",
+    "token-saver",
+    "cli",
+    "rust",
+    "claude",
+    "copilot",
+    "cursor"
+  ],
+  "engines": {
+    "node": ">=18"
+  }
+}

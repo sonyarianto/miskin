@@ -1,5 +1,13 @@
 # Installation
 
+## npm (recommended)
+
+```bash
+npm install -g miskin
+```
+
+Downloads the pre-built binary for your platform. No Rust required.
+
 ## Cargo
 
 ```bash
