@@ -1,0 +1,94 @@
+name: Publish
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-binaries:
+    strategy:
+      matrix:
+        include:
+          - target: x86_64-unknown-linux-gnu
+            os: ubuntu-latest
+            binary: miskin-linux-x64
+          - target: aarch64-unknown-linux-gnu
+            os: ubuntu-latest
+            binary: miskin-linux-arm64
+          - target: x86_64-apple-darwin
+            os: macos-latest
+            binary: miskin-macos-x64
+          - target: aarch64-apple-darwin
+            os: macos-latest
+            binary: miskin-macos-arm64
+          - target: x86_64-pc-windows-msvc
+            os: windows-latest
+            binary: miskin-windows-x64.exe
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Install cross-compiler (linux arm64)
+        if: matrix.target == 'aarch64-unknown-linux-gnu'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-aarch64-linux-gnu
+
+      - name: Build
+        run: cargo build --release --target ${{ matrix.target }}
+
+      - name: Rename binary
+        shell: bash
+        run: |
+          if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
+            cp target/${{ matrix.target }}/release/miskin.exe "${{ matrix.binary }}"
+          else
+            cp target/${{ matrix.target }}/release/miskin "${{ matrix.binary }}"
+          fi
+
+      - name: Upload binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.binary }}
+          path: ${{ matrix.binary }}
+
+  github-release:
+    needs: build-binaries
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: miskin-*
+          merge-multiple: true
+      - name: Create release
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: "miskin-*"
+          generateReleaseNotes: true
+
+  npm-publish:
+    needs: github-release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+      - name: Set version from tag
+        working-directory: packages/npm
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/v}
+          sed -i "s/\"version\": \"[0-9.]*\"/\"version\": \"$VERSION\"/" package.json
+          sed -i "s/const VERSION = \"[0-9.]*\"/const VERSION = \"$VERSION\"/" install.js
+      - run: npm publish --access public
+        working-directory: packages/npm
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
