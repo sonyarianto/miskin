@@ -21,8 +21,9 @@ Inspired by [RTK](https://github.com/rtk-ai/rtk) and [Caveman](https://github.co
 ## Quick Start
 
 ```bash
-# Build from source
-cargo install --path .
+# Install
+npm install -g miskin                    # npm
+# or: cargo install miskin               # crates.io
 
 # Install hooks for your AI tool
 miskin init                # Claude Code (default)

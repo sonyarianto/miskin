@@ -38,7 +38,8 @@ features:
 
 ```bash
 # Install
-cargo install miskin
+npm install -g miskin      # recommended
+# or: cargo install miskin
 
 # Set up hooks for your AI tool
 miskin init               # Claude Code
