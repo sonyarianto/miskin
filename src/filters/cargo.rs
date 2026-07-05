@@ -160,6 +160,28 @@ fn filter_cargo_clippy(output: &str, exit_code: Option<i32>) -> String {
     generic::truncate_lines(&grouped, 80)
 }
 
+fn filter_cargo_fmt(output: &str, _exit_code: Option<i32>) -> String {
+    let lines: Vec<&str> = output.lines().filter(|l| !l.trim().is_empty()).collect();
+    if lines.is_empty() {
+        return "fmt ok".to_string();
+    }
+    let mut files = Vec::new();
+    for line in &lines {
+        let trimmed = line.trim();
+        if trimmed.ends_with(".rs") || trimmed.contains("Diff in") {
+            files.push(trimmed.to_string());
+        }
+    }
+    if files.is_empty() {
+        return format!("{} files need formatting", lines.len());
+    }
+    format!(
+        "{} files need formatting:\n{}",
+        files.len(),
+        files.join("\n")
+    )
+}
+
 #[cfg(test)]
 mod unit_tests {
     use super::*;
@@ -257,26 +279,4 @@ test result: FAILED. 1 passed; 1 failed",
         let r = run(&f, "fmt", "", Some(0));
         assert_eq!(r, "fmt ok");
     }
-}
-
-fn filter_cargo_fmt(output: &str, _exit_code: Option<i32>) -> String {
-    let lines: Vec<&str> = output.lines().filter(|l| !l.trim().is_empty()).collect();
-    if lines.is_empty() {
-        return "fmt ok".to_string();
-    }
-    let mut files = Vec::new();
-    for line in &lines {
-        let trimmed = line.trim();
-        if trimmed.ends_with(".rs") || trimmed.contains("Diff in") {
-            files.push(trimmed.to_string());
-        }
-    }
-    if files.is_empty() {
-        return format!("{} files need formatting", lines.len());
-    }
-    format!(
-        "{} files need formatting:\n{}",
-        files.len(),
-        files.join("\n")
-    )
 }

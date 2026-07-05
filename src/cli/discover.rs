@@ -33,7 +33,7 @@ pub fn run(all: bool, since: u32) -> anyhow::Result<()> {
         .filter(|(cmd, _)| !registry.has(cmd))
         .collect();
 
-    missed.sort_by(|a, b| b.1.0.cmp(&a.1.0));
+    missed.sort_by_key(|b| std::cmp::Reverse(b.1.0));
 
     if missed.is_empty() {
         println!("No missed opportunities! All commands are filtered.");

@@ -56,6 +56,13 @@ fn filter_logs(output: &str) -> String {
     generic::deduplicate_lines(output)
 }
 
+fn filter_compose(output: &str) -> String {
+    if output.trim().is_empty() {
+        return "ok".to_string();
+    }
+    generic::truncate_lines(output, 30)
+}
+
 #[cfg(test)]
 mod unit_tests {
     use super::*;
@@ -103,11 +110,4 @@ mod unit_tests {
         let r = run(&f, "compose", "", Some(0));
         assert_eq!(r, "ok");
     }
-}
-
-fn filter_compose(output: &str) -> String {
-    if output.trim().is_empty() {
-        return "ok".to_string();
-    }
-    generic::truncate_lines(output, 30)
 }

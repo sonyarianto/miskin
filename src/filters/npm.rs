@@ -66,7 +66,7 @@ fn filter_install(output: &str, exit_code: Option<i32>) -> String {
     if exit_code == Some(0) {
         return "install ok".to_string();
     }
-    generic::truncate_lines(&output, 40)
+    generic::truncate_lines(output, 40)
 }
 
 fn filter_script(output: &str, exit_code: Option<i32>) -> String {
@@ -78,7 +78,7 @@ fn filter_script(output: &str, exit_code: Option<i32>) -> String {
         }
         return last_few.into_iter().rev().collect::<Vec<_>>().join("\n");
     }
-    generic::truncate_lines(&output, 50)
+    generic::truncate_lines(output, 50)
 }
 
 fn filter_list(output: &str) -> String {
@@ -92,6 +92,19 @@ fn filter_list(output: &str) -> String {
         packages.len(),
         generic::truncate_lines(&packages.join("\n"), 40)
     )
+}
+
+fn filter_outdated(output: &str) -> String {
+    let lines: Vec<&str> = output.lines().filter(|l| !l.trim().is_empty()).collect();
+    let outdated: Vec<&str> = lines
+        .iter()
+        .filter(|l| l.contains("->") || l.contains("→"))
+        .copied()
+        .collect();
+    if outdated.is_empty() {
+        return "all up to date".to_string();
+    }
+    format!("{} outdated\n{}", outdated.len(), outdated.join("\n"))
 }
 
 #[cfg(test)]
@@ -148,17 +161,4 @@ mod unit_tests {
         let r = run(&f, "outdated", "", Some(0));
         assert_eq!(r, "all up to date");
     }
-}
-
-fn filter_outdated(output: &str) -> String {
-    let lines: Vec<&str> = output.lines().filter(|l| !l.trim().is_empty()).collect();
-    let outdated: Vec<&str> = lines
-        .iter()
-        .filter(|l| l.contains("->") || l.contains("→"))
-        .copied()
-        .collect();
-    if outdated.is_empty() {
-        return "all up to date".to_string();
-    }
-    format!("{} outdated\n{}", outdated.len(), outdated.join("\n"))
 }

@@ -2,7 +2,6 @@ pub mod counter;
 pub mod report;
 
 use serde::{Deserialize, Serialize};
-use std::path::PathBuf;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SessionEntry {
@@ -21,7 +20,7 @@ pub struct AnalyticsStore {
 }
 
 impl AnalyticsStore {
-    pub fn load(data_dir: &PathBuf) -> anyhow::Result<Self> {
+    pub fn load(data_dir: &std::path::Path) -> anyhow::Result<Self> {
         let path = data_dir.join("analytics.json");
         if path.exists() {
             let content = std::fs::read_to_string(&path)?;
@@ -34,7 +33,7 @@ impl AnalyticsStore {
         }
     }
 
-    pub fn save(&self, data_dir: &PathBuf) -> anyhow::Result<()> {
+    pub fn save(&self, data_dir: &std::path::Path) -> anyhow::Result<()> {
         std::fs::create_dir_all(data_dir)?;
         let path = data_dir.join("analytics.json");
         let content = serde_json::to_string_pretty(self)?;

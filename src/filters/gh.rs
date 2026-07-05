@@ -105,9 +105,7 @@ fn filter_pr_view(output: &str) -> String {
             || trimmed.starts_with("body:")
             || trimmed.starts_with("Milestone:")
             || trimmed.starts_with("Assignees:")
-        {
-            result.push(trimmed.to_string());
-        } else if trimmed.contains("✓")
+            || trimmed.contains("✓")
             || trimmed.contains("✗")
             || trimmed.contains("PASS")
             || trimmed.contains("FAIL")
@@ -149,12 +147,14 @@ fn filter_pr_status(output: &str) -> String {
         if trimmed.starts_with("Requesting a code review from you") {
             current = &mut review;
         }
-        if !trimmed.is_empty() && !trimmed.starts_with('-') && !trimmed.starts_with('#') {
-            if let Some(_hash_pos) = trimmed.find('#') {
-                let pr_info = trimmed.trim_start_matches(|c: char| !c.is_ascii_digit() && c != '#');
-                if pr_info.starts_with('#') {
-                    current.push(pr_info.to_string());
-                }
+        if !trimmed.is_empty()
+            && !trimmed.starts_with('-')
+            && !trimmed.starts_with('#')
+            && let Some(_hash_pos) = trimmed.find('#')
+        {
+            let pr_info = trimmed.trim_start_matches(|c: char| !c.is_ascii_digit() && c != '#');
+            if pr_info.starts_with('#') {
+                current.push(pr_info.to_string());
             }
         }
     }
@@ -227,11 +227,6 @@ fn filter_run_list(output: &str) -> String {
             || trimmed.contains("queued")
         {
             in_progress.push(trimmed.to_string());
-        } else if trimmed.contains("completed")
-            || trimmed.contains("success")
-            || trimmed.contains("✓")
-        {
-            completed.push(trimmed.to_string());
         } else {
             completed.push(trimmed.to_string());
         }

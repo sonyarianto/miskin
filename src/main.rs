@@ -163,12 +163,11 @@ async fn run_passthrough(args: &[String], ultra_compact: bool) -> anyhow::Result
 
     let filtered_tokens = analytics::counter::count_tokens(&final_output);
 
-    if exit_code != Some(0) || !stderr.is_empty() {
-        if let Ok(tee_path) =
+    if (exit_code != Some(0) || !stderr.is_empty())
+        && let Ok(tee_path) =
             tee::save_raw(&config.analytics.data_dir, &args.join(" "), &full_output)
-        {
-            eprintln!("[full output: {}]", tee_path.display());
-        }
+    {
+        eprintln!("[full output: {}]", tee_path.display());
     }
 
     print!("{}", final_output);

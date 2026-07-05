@@ -110,6 +110,33 @@ fn filter_find(output: &str) -> String {
     )
 }
 
+fn filter_tree(output: &str) -> String {
+    let lines: Vec<&str> = output.lines().collect();
+    let dirs: Vec<&str> = lines.iter().filter(|l| l.contains('/')).copied().collect();
+    let files: Vec<&str> = lines
+        .iter()
+        .filter(|l| !l.contains('/') && !l.contains("directories"))
+        .copied()
+        .collect();
+
+    let mut result = Vec::new();
+    result.push(format!("{} dirs, {} files", dirs.len(), files.len()));
+
+    let depth_0: Vec<&str> = lines
+        .iter()
+        .filter(|l| l.starts_with("├── ") || l.starts_with("└── "))
+        .copied()
+        .collect();
+    for d in depth_0.iter().take(30) {
+        result.push((*d).to_string());
+    }
+    if depth_0.len() > 30 {
+        result.push(format!("... {} more", depth_0.len() - 30));
+    }
+
+    result.join("\n")
+}
+
 #[cfg(test)]
 mod unit_tests {
     use super::*;
@@ -163,31 +190,4 @@ mod unit_tests {
         let r = run(&f, "find", "", Some(0));
         assert_eq!(r, "no matches");
     }
-}
-
-fn filter_tree(output: &str) -> String {
-    let lines: Vec<&str> = output.lines().collect();
-    let dirs: Vec<&str> = lines.iter().filter(|l| l.contains('/')).copied().collect();
-    let files: Vec<&str> = lines
-        .iter()
-        .filter(|l| !l.contains('/') && !l.contains("directories"))
-        .copied()
-        .collect();
-
-    let mut result = Vec::new();
-    result.push(format!("{} dirs, {} files", dirs.len(), files.len()));
-
-    let depth_0: Vec<&str> = lines
-        .iter()
-        .filter(|l| l.starts_with("├── ") || l.starts_with("└── "))
-        .copied()
-        .collect();
-    for d in depth_0.iter().take(30) {
-        result.push((*d).to_string());
-    }
-    if depth_0.len() > 30 {
-        result.push(format!("... {} more", depth_0.len() - 30));
-    }
-
-    result.join("\n")
 }

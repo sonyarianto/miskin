@@ -62,13 +62,11 @@ fn filter_grouped_linter(output: &str, exit_code: Option<i32>) -> String {
             || trimmed.contains("Error")
             || trimmed.contains("Warning")
             || trimmed.matches(':').count() >= 2
-        {
-            problems.push(trimmed.to_string());
-        } else if trimmed.ends_with(".js")
+            || trimmed.ends_with(".js")
             || trimmed.ends_with(".ts")
             || trimmed.ends_with(".tsx")
             || trimmed.ends_with(".rs")
-            || trimmed.ends_with(".py") && trimmed.contains(':')
+            || (trimmed.ends_with(".py") && trimmed.contains(':'))
         {
             problems.push(trimmed.to_string());
         }
@@ -154,6 +152,24 @@ fn filter_typecheck(output: &str, exit_code: Option<i32>) -> String {
     result.join("\n")
 }
 
+fn filter_prettier(output: &str, exit_code: Option<i32>) -> String {
+    if exit_code == Some(0) {
+        return "format ok".to_string();
+    }
+    let lines: Vec<&str> = output
+        .lines()
+        .filter(|l| !l.trim().is_empty() && !l.contains("Checking"))
+        .collect();
+    if lines.is_empty() {
+        return "format ok".to_string();
+    }
+    format!(
+        "{} files need formatting:\n{}",
+        lines.len(),
+        generic::truncate_lines(&lines.join("\n"), 30)
+    )
+}
+
 #[cfg(test)]
 mod unit_tests {
     use super::*;
@@ -208,22 +224,4 @@ mod unit_tests {
         let r = run(&f, "tsc", "", Some(0));
         assert_eq!(r, "types ok");
     }
-}
-
-fn filter_prettier(output: &str, exit_code: Option<i32>) -> String {
-    if exit_code == Some(0) {
-        return "format ok".to_string();
-    }
-    let lines: Vec<&str> = output
-        .lines()
-        .filter(|l| !l.trim().is_empty() && !l.contains("Checking"))
-        .collect();
-    if lines.is_empty() {
-        return "format ok".to_string();
-    }
-    format!(
-        "{} files need formatting:\n{}",
-        lines.len(),
-        generic::truncate_lines(&lines.join("\n"), 30)
-    )
 }

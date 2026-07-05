@@ -38,7 +38,7 @@ fn filter_git_ok(subcommand: &str, output: &str) -> String {
             return format!("ok {}", subcommand);
         }
         let last = lines.last().unwrap_or(&"");
-        let branch = last.split('/').last().unwrap_or(&".");
+        let branch = last.split('/').next_back().unwrap_or(".");
         return format!("ok {} {}", subcommand, branch);
     }
 
@@ -220,7 +220,7 @@ fn filter_git_diff(output: &str) -> String {
 
 fn filter_git_log(output: &str) -> String {
     let lines: Vec<&str> = output.lines().filter(|l| !l.trim().is_empty()).collect();
-    let commits: Vec<&str> = lines.iter().copied().collect();
+    let commits: Vec<&str> = lines.to_vec();
 
     if commits.len() > 20 {
         format!(

@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct MiskinConfig {
     #[serde(default)]
     pub general: GeneralConfig,
@@ -69,17 +69,6 @@ pub struct AnalyticsConfig {
     pub data_dir: PathBuf,
 }
 
-impl Default for MiskinConfig {
-    fn default() -> Self {
-        Self {
-            general: GeneralConfig::default(),
-            filters: FiltersConfig::default(),
-            caveman: CavemanConfig::default(),
-            analytics: AnalyticsConfig::default(),
-        }
-    }
-}
-
 impl Default for GeneralConfig {
     fn default() -> Self {
         Self {
@@ -131,10 +120,9 @@ fn default_level() -> CavemanLevel {
 }
 
 fn default_data_dir() -> PathBuf {
-    let dir = dirs::data_local_dir()
+    dirs::data_local_dir()
         .unwrap_or_else(|| PathBuf::from("."))
-        .join("miskin");
-    dir
+        .join("miskin")
 }
 
 impl MiskinConfig {

@@ -73,6 +73,42 @@ pub fn group_by_extension(files: &[String]) -> Vec<String> {
     result
 }
 
+pub fn group_by_common_prefix(paths: &[String]) -> String {
+    if paths.is_empty() {
+        return String::new();
+    }
+    if paths.len() <= 5 {
+        return paths.join("\n");
+    }
+
+    let mut by_dir: HashMap<String, Vec<String>> = HashMap::new();
+
+    for path in paths {
+        let dir = if let Some(pos) = path.rfind('/') {
+            path[..pos + 1].to_string()
+        } else {
+            path.clone()
+        };
+        by_dir.entry(dir).or_default().push(path.clone());
+    }
+
+    let mut result = Vec::new();
+    for (dir, mut files) in by_dir {
+        files.sort();
+        if files.len() <= 3 {
+            result.extend(files);
+        } else {
+            result.push(format!(
+                "{}/ ({} files)",
+                dir.trim_end_matches('/'),
+                files.len()
+            ));
+        }
+    }
+    result.sort();
+    result.join("\n")
+}
+
 #[cfg(test)]
 mod unit_tests {
     use super::*;
@@ -130,40 +166,4 @@ mod unit_tests {
         assert!(r.contains("src") && r.contains("4 files") || r.contains("src/a.rs"));
         assert!(r.contains("e.rs"));
     }
-}
-
-pub fn group_by_common_prefix(paths: &[String]) -> String {
-    if paths.is_empty() {
-        return String::new();
-    }
-    if paths.len() <= 5 {
-        return paths.join("\n");
-    }
-
-    let mut by_dir: HashMap<String, Vec<String>> = HashMap::new();
-
-    for path in paths {
-        let dir = if let Some(pos) = path.rfind('/') {
-            path[..pos + 1].to_string()
-        } else {
-            path.clone()
-        };
-        by_dir.entry(dir).or_default().push(path.clone());
-    }
-
-    let mut result = Vec::new();
-    for (dir, mut files) in by_dir {
-        files.sort();
-        if files.len() <= 3 {
-            result.extend(files);
-        } else {
-            result.push(format!(
-                "{}/ ({} files)",
-                dir.trim_end_matches('/'),
-                files.len()
-            ));
-        }
-    }
-    result.sort();
-    result.join("\n")
 }
