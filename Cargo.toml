@@ -1,11 +1,11 @@
 [package]
 name = "miskin"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2024"
 description = "Save AI tokens. CLI proxy that compresses command output + injects caveman-mode prompts."
 license = "MIT"
 repository = "https://github.com/sonyarianto/miskin"
-keywords = ["cli", "ai", "llm", "tokens", "token-saver", "rust"]
+keywords = ["cli", "ai", "llm", "tokens", "token-saver"]
 categories = ["command-line-utilities", "development-tools"]
 
 [[bin]]

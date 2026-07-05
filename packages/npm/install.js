@@ -3,7 +3,7 @@ const fs = require("fs");
 const path = require("path");
 const https = require("https");
 
-const VERSION = "0.1.0";
+const VERSION = "0.1.1";
 const BIN_DIR = path.join(__dirname, "bin");
 
 function getBinaryName() {
