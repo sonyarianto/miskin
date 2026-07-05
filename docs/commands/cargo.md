@@ -28,7 +28,7 @@ Success:
 ```bash
 $ miskin cargo build
 
-Compiling miskin v0.1.0
+Compiling miskin v0.1.1
 Finished dev [unoptimized] target(s) in 2.34s
 ```
 

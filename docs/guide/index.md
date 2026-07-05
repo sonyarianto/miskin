@@ -22,7 +22,7 @@ cargo install --path .
 
 ```bash
 miskin --version
-# miskin 0.1.0
+# miskin 0.1.1
 ```
 
 ## 2. Set Up Hooks
