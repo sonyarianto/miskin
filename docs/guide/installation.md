@@ -47,7 +47,6 @@ Extract the zip and add `miskin.exe` to your `PATH`.
 
 ```bash
 miskin --version
-# miskin 0.1.1
 ```
 
 ## Requirements
