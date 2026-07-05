@@ -15,8 +15,7 @@ async fn main() -> anyhow::Result<()> {
     let cli = cli::Cli::parse();
 
     let env_filter = match cli.verbose {
-        0 => EnvFilter::try_from_default_env()
-            .unwrap_or_else(|_| EnvFilter::new("warn")),
+        0 => EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new("warn")),
         1 => EnvFilter::new("info"),
         2 => EnvFilter::new("debug"),
         _ => EnvFilter::new("trace"),
@@ -33,18 +32,12 @@ async fn main() -> anyhow::Result<()> {
                 args.auto_patch,
                 args.show,
             )?,
-            Commands::Stats(args) => cli::stats::run(
-                args.graph,
-                args.history,
-                args.daily,
-                args.all,
-                args.json,
-            )?,
+            Commands::Stats(args) => {
+                cli::stats::run(args.graph, args.history, args.daily, args.all, args.json)?
+            }
             Commands::Config(args) => match args.action.unwrap_or(cli::ConfigAction::Show) {
                 cli::ConfigAction::Show => cli::config_cmd::run()?,
-                cli::ConfigAction::Set { key, value } => {
-                    cli::config_cmd::set(&key, &value)?
-                }
+                cli::ConfigAction::Set { key, value } => cli::config_cmd::set(&key, &value)?,
                 cli::ConfigAction::Reset => cli::config_cmd::reset()?,
             },
             Commands::Compress => run_compress(cli.ultra_compact)?,
@@ -63,20 +56,26 @@ async fn main() -> anyhow::Result<()> {
 
 async fn run_passthrough(args: &[String], ultra_compact: bool) -> anyhow::Result<()> {
     use tokio::io::AsyncReadExt;
-    use tokio::process::Command;
     use tokio::io::AsyncWriteExt;
+    use tokio::process::Command;
 
     let config = config::MiskinConfig::load()?;
     let command_name = &args[0];
     let subcommand_args = &args[1..];
 
     if !config.general.enabled {
-        let status = Command::new(command_name).args(subcommand_args).status().await?;
+        let status = Command::new(command_name)
+            .args(subcommand_args)
+            .status()
+            .await?;
         std::process::exit(status.code().unwrap_or(1));
     }
 
     if config.general.exclude_commands.contains(command_name) {
-        let status = Command::new(command_name).args(subcommand_args).status().await?;
+        let status = Command::new(command_name)
+            .args(subcommand_args)
+            .status()
+            .await?;
         std::process::exit(status.code().unwrap_or(1));
     }
 
@@ -113,7 +112,8 @@ async fn run_passthrough(args: &[String], ultra_compact: bool) -> anyhow::Result
         }
     };
 
-    let (stdout_result, stderr_result, status) = tokio::join!(stdout_task, stderr_task, child.wait());
+    let (stdout_result, stderr_result, status) =
+        tokio::join!(stdout_task, stderr_task, child.wait());
 
     let stdout_buf = stdout_result?;
     let stderr_buf = stderr_result?;
@@ -133,7 +133,10 @@ async fn run_passthrough(args: &[String], ultra_compact: bool) -> anyhow::Result
             filters::FilterResult::Silent => String::new(),
         }
     } else if let Some(filter) = registry.get(
-        subcommand_args.first().map(|s| s.as_str()).unwrap_or(command_name),
+        subcommand_args
+            .first()
+            .map(|s| s.as_str())
+            .unwrap_or(command_name),
     ) {
         match filter.filter(&subcommand_args[1..], &full_output, exit_code) {
             filters::FilterResult::Filtered(s) => s,
@@ -144,7 +147,8 @@ async fn run_passthrough(args: &[String], ultra_compact: bool) -> anyhow::Result
         let max = config.filters.max_lines;
         if config.filters.deduplicate {
             filters::generic::deduplicate_lines(&filters::generic::truncate_lines(
-                &full_output, max,
+                &full_output,
+                max,
             ))
         } else {
             filters::generic::truncate_lines(&full_output, max)
@@ -172,7 +176,11 @@ async fn run_passthrough(args: &[String], ultra_compact: bool) -> anyhow::Result
     if config.analytics.enabled {
         let mut store =
             analytics::AnalyticsStore::load(&config.analytics.data_dir).unwrap_or_default();
-        store.record(&args.join(" "), original_tokens as u64, filtered_tokens as u64);
+        store.record(
+            &args.join(" "),
+            original_tokens as u64,
+            filtered_tokens as u64,
+        );
         let _ = store.save(&config.analytics.data_dir);
     }
 
@@ -193,7 +201,11 @@ async fn run_proxy(args: &[String]) -> anyhow::Result<()> {
         let tokens = analytics::counter::count_tokens(&output_str);
         let mut store =
             analytics::AnalyticsStore::load(&config.analytics.data_dir).unwrap_or_default();
-        store.record(&format!("[proxy] {}", args.join(" ")), tokens as u64, tokens as u64);
+        store.record(
+            &format!("[proxy] {}", args.join(" ")),
+            tokens as u64,
+            tokens as u64,
+        );
         let _ = store.save(&config.analytics.data_dir);
     }
 
@@ -247,7 +259,12 @@ fn ultra_compact_format(input: &str) -> String {
         .iter()
         .map(|l| l.trim())
         .filter(|l| !l.is_empty())
-        .map(|l| l.replace("pass", "✓").replace("fail", "✗").replace("PASS", "✓").replace("FAIL", "✗"))
+        .map(|l| {
+            l.replace("pass", "✓")
+                .replace("fail", "✗")
+                .replace("PASS", "✓")
+                .replace("FAIL", "✗")
+        })
         .collect::<Vec<_>>()
         .join("\n")
 }

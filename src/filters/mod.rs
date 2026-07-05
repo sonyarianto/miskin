@@ -43,8 +43,7 @@ impl FilterRegistry {
 
     pub fn register(&mut self, filter: Box<dyn CommandFilter>) {
         let idx = self.filters.len();
-        self.alias_map
-            .insert(filter.name().to_string(), idx);
+        self.alias_map.insert(filter.name().to_string(), idx);
         for alias in filter.aliases() {
             self.alias_map.insert(alias.to_string(), idx);
         }

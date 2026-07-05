@@ -1,5 +1,5 @@
-use crate::filters::generic;
 use super::{CommandFilter, FilterResult};
+use crate::filters::generic;
 
 pub struct GitFilter;
 
@@ -14,9 +14,9 @@ impl CommandFilter for GitFilter {
 
         if exit_code == Some(0) {
             match subcommand {
-                "add" | "commit" | "push" | "pull" | "fetch" | "checkout" | "switch"
-                | "merge" | "rebase" | "tag" | "stash" | "reset" | "restore" | "rm"
-                | "mv" | "clean" | "init" | "clone" | "remote" => {
+                "add" | "commit" | "push" | "pull" | "fetch" | "checkout" | "switch" | "merge"
+                | "rebase" | "tag" | "stash" | "reset" | "restore" | "rm" | "mv" | "clean"
+                | "init" | "clone" | "remote" => {
                     return FilterResult::Filtered(filter_git_ok(subcommand, &output));
                 }
                 "status" => return FilterResult::Filtered(filter_git_status(&output)),
@@ -100,7 +100,10 @@ fn filter_git_status(output: &str) -> String {
             continue;
         }
 
-        if trimmed.starts_with("(use ") || trimmed.starts_with("no changes") || trimmed.starts_with("nothing") {
+        if trimmed.starts_with("(use ")
+            || trimmed.starts_with("no changes")
+            || trimmed.starts_with("nothing")
+        {
             continue;
         }
 
@@ -247,8 +250,16 @@ mod unit_tests {
     use super::*;
     use crate::filters::CommandFilter;
 
-    fn run(filter: &dyn CommandFilter, subcommand: &str, output: &str, exit_code: Option<i32>) -> String {
-        let args: Vec<String> = subcommand.split_whitespace().map(|s| s.to_string()).collect();
+    fn run(
+        filter: &dyn CommandFilter,
+        subcommand: &str,
+        output: &str,
+        exit_code: Option<i32>,
+    ) -> String {
+        let args: Vec<String> = subcommand
+            .split_whitespace()
+            .map(|s| s.to_string())
+            .collect();
         match filter.filter(&args, output, exit_code) {
             FilterResult::Filtered(s) => s,
             FilterResult::PassThrough(s) => s,
@@ -259,14 +270,24 @@ mod unit_tests {
     #[test]
     fn status_clean() {
         let f = GitFilter;
-        let r = run(&f, "status", "On branch main\nnothing to commit, working tree clean", Some(0));
+        let r = run(
+            &f,
+            "status",
+            "On branch main\nnothing to commit, working tree clean",
+            Some(0),
+        );
         assert!(r.contains("On branch main"));
     }
 
     #[test]
     fn status_modified() {
         let f = GitFilter;
-        let r = run(&f, "status", "On branch main\nChanges not staged for commit:\n\tmodified:   src/main.rs", Some(0));
+        let r = run(
+            &f,
+            "status",
+            "On branch main\nChanges not staged for commit:\n\tmodified:   src/main.rs",
+            Some(0),
+        );
         assert!(r.contains("On branch main"));
         assert!(r.contains("modified:"));
     }
@@ -274,7 +295,12 @@ mod unit_tests {
     #[test]
     fn diff_compact() {
         let f = GitFilter;
-        let r = run(&f, "diff", "diff --git a/src/main.rs b/src/main.rs\n--- a/src/main.rs\n+++ b/src/main.rs\n@@ -1 +1 @@\n-old\n+new", Some(0));
+        let r = run(
+            &f,
+            "diff",
+            "diff --git a/src/main.rs b/src/main.rs\n--- a/src/main.rs\n+++ b/src/main.rs\n@@ -1 +1 @@\n-old\n+new",
+            Some(0),
+        );
         assert!(r.contains("1 files"));
     }
 
@@ -288,14 +314,24 @@ mod unit_tests {
     #[test]
     fn ok_commit() {
         let f = GitFilter;
-        let r = run(&f, "commit", "[main abc1234] fix: bug\n 1 file changed", Some(0));
+        let r = run(
+            &f,
+            "commit",
+            "[main abc1234] fix: bug\n 1 file changed",
+            Some(0),
+        );
         assert!(r.contains("[main abc1234]"));
     }
 
     #[test]
     fn ok_push() {
         let f = GitFilter;
-        let r = run(&f, "push", "To github.com:user/repo\n   abc..def  main -> main", Some(0));
+        let r = run(
+            &f,
+            "push",
+            "To github.com:user/repo\n   abc..def  main -> main",
+            Some(0),
+        );
         assert!(r.contains("ok push"));
     }
 

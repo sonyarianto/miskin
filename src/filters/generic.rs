@@ -93,7 +93,10 @@ mod unit_tests {
 
     #[test]
     fn truncate_long() {
-        let lines = (0..100).map(|i| format!("ln{}", i)).collect::<Vec<_>>().join("\n");
+        let lines = (0..100)
+            .map(|i| format!("ln{}", i))
+            .collect::<Vec<_>>()
+            .join("\n");
         let r = truncate_lines(&lines, 20);
         assert!(r.contains("lines omitted"));
     }
@@ -108,12 +111,21 @@ mod unit_tests {
     fn group_ext_multiple() {
         let files = vec!["a.rs".into(), "b.rs".into(), "c.toml".into(), "d.md".into()];
         let r = group_by_extension(&files);
-        assert!(r.iter().any(|s| s.contains("*.rs") && s.contains("2 files")));
+        assert!(
+            r.iter()
+                .any(|s| s.contains("*.rs") && s.contains("2 files"))
+        );
     }
 
     #[test]
     fn group_prefix() {
-        let paths = vec!["src/a.rs".into(), "src/b.rs".into(), "src/c.rs".into(), "src/d.rs".into(), "tests/e.rs".into()];
+        let paths = vec![
+            "src/a.rs".into(),
+            "src/b.rs".into(),
+            "src/c.rs".into(),
+            "src/d.rs".into(),
+            "tests/e.rs".into(),
+        ];
         let r = group_by_common_prefix(&paths);
         assert!(r.contains("src") && r.contains("4 files") || r.contains("src/a.rs"));
         assert!(r.contains("e.rs"));
@@ -145,7 +157,11 @@ pub fn group_by_common_prefix(paths: &[String]) -> String {
         if files.len() <= 3 {
             result.extend(files);
         } else {
-            result.push(format!("{}/ ({} files)", dir.trim_end_matches('/'), files.len()));
+            result.push(format!(
+                "{}/ ({} files)",
+                dir.trim_end_matches('/'),
+                files.len()
+            ));
         }
     }
     result.sort();

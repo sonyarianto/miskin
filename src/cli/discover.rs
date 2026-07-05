@@ -16,7 +16,12 @@ pub fn run(all: bool, since: u32) -> anyhow::Result<()> {
         if !all && entry.timestamp < cutoff {
             continue;
         }
-        let cmd = entry.command.split_whitespace().next().unwrap_or(&entry.command).to_string();
+        let cmd = entry
+            .command
+            .split_whitespace()
+            .next()
+            .unwrap_or(&entry.command)
+            .to_string();
         let stats = by_command.entry(cmd).or_insert((0, 0, 0));
         stats.0 += 1;
         stats.1 += entry.original_tokens;
@@ -28,7 +33,7 @@ pub fn run(all: bool, since: u32) -> anyhow::Result<()> {
         .filter(|(cmd, _)| !registry.has(cmd))
         .collect();
 
-    missed.sort_by(|a, b| b.1 .0.cmp(&a.1 .0));
+    missed.sort_by(|a, b| b.1.0.cmp(&a.1.0));
 
     if missed.is_empty() {
         println!("No missed opportunities! All commands are filtered.");

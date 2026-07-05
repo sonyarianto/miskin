@@ -1,5 +1,5 @@
-use crate::filters::generic;
 use super::{CommandFilter, FilterResult};
+use crate::filters::generic;
 
 pub struct CargoFilter;
 
@@ -57,7 +57,11 @@ fn filter_cargo_test(output: &str, _exit_code: Option<i32>) -> String {
                 failure_lines = Vec::new();
                 continue;
             }
-            if trimmed.contains("panicked at") || trimmed.contains("assertion") || trimmed.contains("left:") || trimmed.contains("right:") {
+            if trimmed.contains("panicked at")
+                || trimmed.contains("assertion")
+                || trimmed.contains("left:")
+                || trimmed.contains("right:")
+            {
                 failure_lines.push(trimmed.to_string());
             }
             continue;
@@ -104,7 +108,9 @@ fn filter_cargo_build(output: &str, exit_code: Option<i32>) -> String {
     let mut errors = Vec::new();
     for line in &lines {
         let trimmed = line.trim();
-        if trimmed.starts_with("error") || trimmed.starts_with("Error") || trimmed.starts_with("  -->")
+        if trimmed.starts_with("error")
+            || trimmed.starts_with("Error")
+            || trimmed.starts_with("  -->")
         {
             errors.push(trimmed.to_string());
         }
@@ -130,7 +136,11 @@ fn filter_cargo_clippy(output: &str, exit_code: Option<i32>) -> String {
             }
             in_warning = true;
             current_warning.push(trimmed.to_string());
-        } else if in_warning && (trimmed.starts_with("-->") || trimmed.starts_with("= help:") || trimmed.starts_with("= note:")) {
+        } else if in_warning
+            && (trimmed.starts_with("-->")
+                || trimmed.starts_with("= help:")
+                || trimmed.starts_with("= note:"))
+        {
             current_warning.push(trimmed.to_string());
         }
     }
@@ -139,7 +149,11 @@ fn filter_cargo_clippy(output: &str, exit_code: Option<i32>) -> String {
     }
 
     if warnings.is_empty() {
-        return if exit_code == Some(0) { "clippy ok".to_string() } else { generic::truncate_lines(output, 40) };
+        return if exit_code == Some(0) {
+            "clippy ok".to_string()
+        } else {
+            generic::truncate_lines(output, 40)
+        };
     }
 
     let grouped = generic::deduplicate_lines(&warnings.join("\n"));
@@ -151,8 +165,16 @@ mod unit_tests {
     use super::*;
     use crate::filters::CommandFilter;
 
-    fn run(filter: &dyn CommandFilter, subcommand: &str, output: &str, exit_code: Option<i32>) -> String {
-        let args: Vec<String> = subcommand.split_whitespace().map(|s| s.to_string()).collect();
+    fn run(
+        filter: &dyn CommandFilter,
+        subcommand: &str,
+        output: &str,
+        exit_code: Option<i32>,
+    ) -> String {
+        let args: Vec<String> = subcommand
+            .split_whitespace()
+            .map(|s| s.to_string())
+            .collect();
         match filter.filter(&args, output, exit_code) {
             FilterResult::Filtered(s) => s,
             FilterResult::PassThrough(s) => s,
@@ -163,21 +185,29 @@ mod unit_tests {
     #[test]
     fn test_all_pass() {
         let f = CargoFilter;
-        let r = run(&f, "test", "\
+        let r = run(
+            &f,
+            "test",
+            "\
 running 5 tests
 test lib::a ... ok
 test lib::b ... ok
 test lib::c ... ok
 test lib::d ... ok
 test lib::e ... ok
-test result: ok. 5 passed; 0 failed", Some(0));
+test result: ok. 5 passed; 0 failed",
+            Some(0),
+        );
         assert!(r.contains("PASSED: 5/5"));
     }
 
     #[test]
     fn test_with_failures() {
         let f = CargoFilter;
-        let r = run(&f, "test", "\
+        let r = run(
+            &f,
+            "test",
+            "\
 running 2 tests
 test lib::pass ... ok
 test lib::fail ... FAILED
@@ -190,14 +220,21 @@ panicked at 'assertion failed'
 failures:
     lib::fail
 
-test result: FAILED. 1 passed; 1 failed", Some(1));
+test result: FAILED. 1 passed; 1 failed",
+            Some(1),
+        );
         assert!(r.contains("FAILED: 1/2"));
     }
 
     #[test]
     fn build_success() {
         let f = CargoFilter;
-        let r = run(&f, "build", "Compiling miskin v0.1.0\nFinished dev [unoptimized] target(s) in 2s", Some(0));
+        let r = run(
+            &f,
+            "build",
+            "Compiling miskin v0.1.0\nFinished dev [unoptimized] target(s) in 2s",
+            Some(0),
+        );
         assert!(r.contains("Compiling"));
         assert!(r.contains("Finished"));
     }
@@ -205,7 +242,12 @@ test result: FAILED. 1 passed; 1 failed", Some(1));
     #[test]
     fn clippy_ok() {
         let f = CargoFilter;
-        let r = run(&f, "clippy", "Checking miskin v0.1.0\nFinished dev", Some(0));
+        let r = run(
+            &f,
+            "clippy",
+            "Checking miskin v0.1.0\nFinished dev",
+            Some(0),
+        );
         assert!(r.contains("clippy ok"));
     }
 
@@ -232,5 +274,9 @@ fn filter_cargo_fmt(output: &str, _exit_code: Option<i32>) -> String {
     if files.is_empty() {
         return format!("{} files need formatting", lines.len());
     }
-    format!("{} files need formatting:\n{}", files.len(), files.join("\n"))
+    format!(
+        "{} files need formatting:\n{}",
+        files.len(),
+        files.join("\n")
+    )
 }

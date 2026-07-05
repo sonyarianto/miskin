@@ -1,4 +1,4 @@
-use crate::analytics::{report, AnalyticsStore};
+use crate::analytics::{AnalyticsStore, report};
 use crate::config::MiskinConfig;
 use std::collections::HashMap;
 

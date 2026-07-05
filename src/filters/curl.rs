@@ -1,5 +1,5 @@
-use crate::filters::generic;
 use super::{CommandFilter, FilterResult};
+use crate::filters::generic;
 
 pub struct CurlFilter;
 
@@ -33,8 +33,16 @@ mod unit_tests {
     use super::*;
     use crate::filters::CommandFilter;
 
-    fn run(filter: &dyn CommandFilter, subcommand: &str, output: &str, exit_code: Option<i32>) -> String {
-        let args: Vec<String> = subcommand.split_whitespace().map(|s| s.to_string()).collect();
+    fn run(
+        filter: &dyn CommandFilter,
+        subcommand: &str,
+        output: &str,
+        exit_code: Option<i32>,
+    ) -> String {
+        let args: Vec<String> = subcommand
+            .split_whitespace()
+            .map(|s| s.to_string())
+            .collect();
         match filter.filter(&args, output, exit_code) {
             FilterResult::Filtered(s) => s,
             FilterResult::PassThrough(s) => s,

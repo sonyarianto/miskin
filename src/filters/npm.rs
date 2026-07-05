@@ -1,5 +1,5 @@
-use crate::filters::generic;
 use super::{CommandFilter, FilterResult};
+use crate::filters::generic;
 
 pub struct NpmFilter;
 
@@ -28,9 +28,21 @@ impl CommandFilter for NpmFilter {
 
 fn filter_install(output: &str, exit_code: Option<i32>) -> String {
     let lines: Vec<&str> = output.lines().collect();
-    let added: Vec<&str> = lines.iter().filter(|l| l.contains("added")).copied().collect();
-    let removed: Vec<&str> = lines.iter().filter(|l| l.contains("removed")).copied().collect();
-    let changed: Vec<&str> = lines.iter().filter(|l| l.contains("changed") || l.contains("updated")).copied().collect();
+    let added: Vec<&str> = lines
+        .iter()
+        .filter(|l| l.contains("added"))
+        .copied()
+        .collect();
+    let removed: Vec<&str> = lines
+        .iter()
+        .filter(|l| l.contains("removed"))
+        .copied()
+        .collect();
+    let changed: Vec<&str> = lines
+        .iter()
+        .filter(|l| l.contains("changed") || l.contains("updated"))
+        .copied()
+        .collect();
 
     for line in &added {
         let trimmed = line.trim();
@@ -75,7 +87,11 @@ fn filter_list(output: &str) -> String {
     if packages.is_empty() {
         return "no packages".to_string();
     }
-    format!("{} packages\n{}", packages.len(), generic::truncate_lines(&packages.join("\n"), 40))
+    format!(
+        "{} packages\n{}",
+        packages.len(),
+        generic::truncate_lines(&packages.join("\n"), 40)
+    )
 }
 
 #[cfg(test)]
@@ -83,8 +99,16 @@ mod unit_tests {
     use super::*;
     use crate::filters::CommandFilter;
 
-    fn run(filter: &dyn CommandFilter, subcommand: &str, output: &str, exit_code: Option<i32>) -> String {
-        let args: Vec<String> = subcommand.split_whitespace().map(|s| s.to_string()).collect();
+    fn run(
+        filter: &dyn CommandFilter,
+        subcommand: &str,
+        output: &str,
+        exit_code: Option<i32>,
+    ) -> String {
+        let args: Vec<String> = subcommand
+            .split_whitespace()
+            .map(|s| s.to_string())
+            .collect();
         match filter.filter(&args, output, exit_code) {
             FilterResult::Filtered(s) => s,
             FilterResult::PassThrough(s) => s,
@@ -109,7 +133,12 @@ mod unit_tests {
     #[test]
     fn list() {
         let f = NpmFilter;
-        let r = run(&f, "list", "react@18.2.0\nlodash@4.17.1\nvue@3.4.0", Some(0));
+        let r = run(
+            &f,
+            "list",
+            "react@18.2.0\nlodash@4.17.1\nvue@3.4.0",
+            Some(0),
+        );
         assert!(r.contains("3 packages"));
     }
 
@@ -123,7 +152,11 @@ mod unit_tests {
 
 fn filter_outdated(output: &str) -> String {
     let lines: Vec<&str> = output.lines().filter(|l| !l.trim().is_empty()).collect();
-    let outdated: Vec<&str> = lines.iter().filter(|l| l.contains("->") || l.contains("→")).copied().collect();
+    let outdated: Vec<&str> = lines
+        .iter()
+        .filter(|l| l.contains("->") || l.contains("→"))
+        .copied()
+        .collect();
     if outdated.is_empty() {
         return "all up to date".to_string();
     }

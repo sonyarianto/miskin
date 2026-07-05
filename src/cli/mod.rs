@@ -7,7 +7,11 @@ pub mod stats;
 use clap::{Parser, Subcommand};
 
 #[derive(Parser)]
-#[command(name = "miskin", version, about = "Save AI tokens across providers. CLI proxy that compresses command output + injects caveman-mode prompts.")]
+#[command(
+    name = "miskin",
+    version,
+    about = "Save AI tokens across providers. CLI proxy that compresses command output + injects caveman-mode prompts."
+)]
 pub struct Cli {
     #[command(subcommand)]
     pub command: Option<Commands>,

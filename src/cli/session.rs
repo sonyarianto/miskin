@@ -41,12 +41,22 @@ pub fn run(json: bool) -> anyhow::Result<()> {
             let orig: u64 = session.iter().map(|e| e.original_tokens).sum();
             let filt: u64 = session.iter().map(|e| e.filtered_tokens).sum();
             println!("    {{");
-            println!("      \"start\": \"{}\",", session.first().unwrap().timestamp);
+            println!(
+                "      \"start\": \"{}\",",
+                session.first().unwrap().timestamp
+            );
             println!("      \"end\": \"{}\",", session.last().unwrap().timestamp);
             println!("      \"commands\": {},", session.len());
             println!("      \"original_tokens\": {},", orig);
             println!("      \"filtered_tokens\": {},", filt);
-            println!("      \"savings_pct\": {:.1}", if orig > 0 { (orig - filt) as f64 / orig as f64 * 100.0 } else { 0.0 });
+            println!(
+                "      \"savings_pct\": {:.1}",
+                if orig > 0 {
+                    (orig - filt) as f64 / orig as f64 * 100.0
+                } else {
+                    0.0
+                }
+            );
             if i < sessions.len() - 1 {
                 println!("    }},");
             } else {
@@ -56,11 +66,20 @@ pub fn run(json: bool) -> anyhow::Result<()> {
         println!("  ]");
         println!("}}");
     } else {
-        println!("Miskin Adoption — {} sessions, {} total commands\n", sessions.len(), store.entries.len());
+        println!(
+            "Miskin Adoption — {} sessions, {} total commands\n",
+            sessions.len(),
+            store.entries.len()
+        );
 
         let mut by_cmd: HashMap<String, u64> = HashMap::new();
         for entry in &store.entries {
-            let cmd = entry.command.split_whitespace().next().unwrap_or(&entry.command).to_string();
+            let cmd = entry
+                .command
+                .split_whitespace()
+                .next()
+                .unwrap_or(&entry.command)
+                .to_string();
             *by_cmd.entry(cmd).or_insert(0) += 1;
         }
         let mut sorted: Vec<_> = by_cmd.iter().collect();

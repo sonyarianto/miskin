@@ -40,7 +40,9 @@ fi
             .join("hooks")
             .join("miskin-rewrite.sh")
     } else {
-        PathBuf::from(".claude").join("hooks").join("miskin-rewrite.sh")
+        PathBuf::from(".claude")
+            .join("hooks")
+            .join("miskin-rewrite.sh")
     };
 
     if let Some(parent) = path.parent() {
@@ -68,7 +70,9 @@ pub fn uninstall(global: bool) -> anyhow::Result<()> {
             .join("hooks")
             .join("miskin-rewrite.sh")
     } else {
-        PathBuf::from(".claude").join("hooks").join("miskin-rewrite.sh")
+        PathBuf::from(".claude")
+            .join("hooks")
+            .join("miskin-rewrite.sh")
     };
 
     if path.exists() {

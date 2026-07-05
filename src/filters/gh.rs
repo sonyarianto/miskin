@@ -1,5 +1,5 @@
-use crate::filters::generic;
 use super::{CommandFilter, FilterResult};
+use crate::filters::generic;
 
 pub struct GhFilter;
 
@@ -62,9 +62,7 @@ fn filter_pr_list(output: &str) -> String {
         let parts: Vec<&str> = line.split_whitespace().collect();
         if parts.len() >= 3 {
             let number = parts[0];
-            let title_start = parts[1..]
-                .iter()
-                .position(|w| !w.is_empty());
+            let title_start = parts[1..].iter().position(|w| !w.is_empty());
             let title = if let Some(pos) = title_start {
                 parts[1 + pos..].join(" ")
             } else {
@@ -93,17 +91,26 @@ fn filter_pr_view(output: &str) -> String {
         if trimmed.is_empty() {
             continue;
         }
-        if trimmed.starts_with("title:") || trimmed.starts_with("state:")
-            || trimmed.starts_with("author:") || trimmed.starts_with("labels:")
-            || trimmed.starts_with("additions:") || trimmed.starts_with("deletions:")
-            || trimmed.starts_with("merged:") || trimmed.starts_with("draft:")
-            || trimmed.starts_with("base:") || trimmed.starts_with("head:")
-            || trimmed.starts_with("url:") || trimmed.starts_with("body:")
-            || trimmed.starts_with("Milestone:") || trimmed.starts_with("Assignees:")
+        if trimmed.starts_with("title:")
+            || trimmed.starts_with("state:")
+            || trimmed.starts_with("author:")
+            || trimmed.starts_with("labels:")
+            || trimmed.starts_with("additions:")
+            || trimmed.starts_with("deletions:")
+            || trimmed.starts_with("merged:")
+            || trimmed.starts_with("draft:")
+            || trimmed.starts_with("base:")
+            || trimmed.starts_with("head:")
+            || trimmed.starts_with("url:")
+            || trimmed.starts_with("body:")
+            || trimmed.starts_with("Milestone:")
+            || trimmed.starts_with("Assignees:")
         {
             result.push(trimmed.to_string());
-        } else if trimmed.contains("✓") || trimmed.contains("✗")
-            || trimmed.contains("PASS") || trimmed.contains("FAIL")
+        } else if trimmed.contains("✓")
+            || trimmed.contains("✗")
+            || trimmed.contains("PASS")
+            || trimmed.contains("FAIL")
         {
             result.push(trimmed.to_string());
         }
@@ -215,9 +222,15 @@ fn filter_run_list(output: &str) -> String {
         let trimmed = line.trim();
         if trimmed.contains("failure") || trimmed.contains("failed") || trimmed.contains("✗") {
             failed.push(trimmed.to_string());
-        } else if trimmed.contains("in_progress") || trimmed.contains("pending") || trimmed.contains("queued") {
+        } else if trimmed.contains("in_progress")
+            || trimmed.contains("pending")
+            || trimmed.contains("queued")
+        {
             in_progress.push(trimmed.to_string());
-        } else if trimmed.contains("completed") || trimmed.contains("success") || trimmed.contains("✓") {
+        } else if trimmed.contains("completed")
+            || trimmed.contains("success")
+            || trimmed.contains("✓")
+        {
             completed.push(trimmed.to_string());
         } else {
             completed.push(trimmed.to_string());
@@ -253,10 +266,14 @@ fn filter_repo_view(output: &str) -> String {
         if trimmed.is_empty() {
             continue;
         }
-        if trimmed.starts_with("name:") || trimmed.starts_with("description:")
-            || trimmed.starts_with("visibility:") || trimmed.starts_with("default branch:")
-            || trimmed.starts_with("stars:") || trimmed.starts_with("forks:")
-            || trimmed.starts_with("open issues:") || trimmed.starts_with("open PRs:")
+        if trimmed.starts_with("name:")
+            || trimmed.starts_with("description:")
+            || trimmed.starts_with("visibility:")
+            || trimmed.starts_with("default branch:")
+            || trimmed.starts_with("stars:")
+            || trimmed.starts_with("forks:")
+            || trimmed.starts_with("open issues:")
+            || trimmed.starts_with("open PRs:")
         {
             result.push(trimmed.to_string());
         }
@@ -284,7 +301,12 @@ mod unit_tests {
     use super::*;
     use crate::filters::CommandFilter;
 
-    fn run(filter: &dyn CommandFilter, args_str: &str, output: &str, exit_code: Option<i32>) -> String {
+    fn run(
+        filter: &dyn CommandFilter,
+        args_str: &str,
+        output: &str,
+        exit_code: Option<i32>,
+    ) -> String {
         let args: Vec<String> = args_str.split_whitespace().map(|s| s.to_string()).collect();
         match filter.filter(&args, output, exit_code) {
             FilterResult::Filtered(s) => s,
@@ -303,7 +325,12 @@ mod unit_tests {
     #[test]
     fn pr_list_with_results() {
         let f = GhFilter;
-        let r = run(&f, "pr list", "NUMBER\tTITLE\tBRANCH\n123\tFix auth bug\tfix/auth\n456\tAdd tests\tfeat/tests", Some(0));
+        let r = run(
+            &f,
+            "pr list",
+            "NUMBER\tTITLE\tBRANCH\n123\tFix auth bug\tfix/auth\n456\tAdd tests\tfeat/tests",
+            Some(0),
+        );
         assert!(r.contains("2 PRs"));
         assert!(r.contains("#123"));
         assert!(r.contains("#456"));
@@ -319,7 +346,12 @@ mod unit_tests {
     #[test]
     fn run_list() {
         let f = GhFilter;
-        let r = run(&f, "run list", "STATUS\tNAME\tBRANCH\ncompleted\tCI\tmain\nfailed\tDeploy\tmain\nin_progress\tRelease\tmain", Some(0));
+        let r = run(
+            &f,
+            "run list",
+            "STATUS\tNAME\tBRANCH\ncompleted\tCI\tmain\nfailed\tDeploy\tmain\nin_progress\tRelease\tmain",
+            Some(0),
+        );
         assert!(r.contains("3 runs"));
         assert!(r.contains("1 failed"));
         assert!(r.contains("1 running"));

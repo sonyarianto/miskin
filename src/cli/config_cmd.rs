@@ -31,7 +31,10 @@ pub fn set(key: &str, value: &str) -> anyhow::Result<()> {
             config.filters.max_lines = value.parse()?;
         }
         _ => {
-            anyhow::bail!("Unknown config key '{}'. Available: caveman.enabled, caveman.level, general.ultra_compact, filters.max_lines", key);
+            anyhow::bail!(
+                "Unknown config key '{}'. Available: caveman.enabled, caveman.level, general.ultra_compact, filters.max_lines",
+                key
+            );
         }
     }
 

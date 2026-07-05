@@ -1,5 +1,5 @@
-use crate::filters::generic;
 use super::{CommandFilter, FilterResult};
+use crate::filters::generic;
 
 pub struct DockerFilter;
 
@@ -17,8 +17,14 @@ impl CommandFilter for DockerFilter {
         let command = args.first().map(|s| s.as_str()).unwrap_or("");
 
         match command {
-            "ps" => FilterResult::Filtered(filter_table(&output, &["CONTAINER ID", "IMAGE", "STATUS", "NAMES"])),
-            "images" => FilterResult::Filtered(filter_table(&output, &["REPOSITORY", "TAG", "IMAGE ID", "SIZE"])),
+            "ps" => FilterResult::Filtered(filter_table(
+                &output,
+                &["CONTAINER ID", "IMAGE", "STATUS", "NAMES"],
+            )),
+            "images" => FilterResult::Filtered(filter_table(
+                &output,
+                &["REPOSITORY", "TAG", "IMAGE ID", "SIZE"],
+            )),
             "logs" => FilterResult::Filtered(filter_logs(&output)),
             "compose" => FilterResult::Filtered(filter_compose(&output)),
             _ => FilterResult::Filtered(generic::truncate_lines(&output, 80)),
@@ -55,8 +61,16 @@ mod unit_tests {
     use super::*;
     use crate::filters::CommandFilter;
 
-    fn run(filter: &dyn CommandFilter, subcommand: &str, output: &str, exit_code: Option<i32>) -> String {
-        let args: Vec<String> = subcommand.split_whitespace().map(|s| s.to_string()).collect();
+    fn run(
+        filter: &dyn CommandFilter,
+        subcommand: &str,
+        output: &str,
+        exit_code: Option<i32>,
+    ) -> String {
+        let args: Vec<String> = subcommand
+            .split_whitespace()
+            .map(|s| s.to_string())
+            .collect();
         match filter.filter(&args, output, exit_code) {
             FilterResult::Filtered(s) => s,
             FilterResult::PassThrough(s) => s,
@@ -74,7 +88,12 @@ mod unit_tests {
     #[test]
     fn ps_with_containers() {
         let f = DockerFilter;
-        let r = run(&f, "ps", "CONTAINER ID   IMAGE         STATUS\nabc123         nginx:latest  Up 2h\ndef456         redis:alpine  Up 5m", Some(0));
+        let r = run(
+            &f,
+            "ps",
+            "CONTAINER ID   IMAGE         STATUS\nabc123         nginx:latest  Up 2h\ndef456         redis:alpine  Up 5m",
+            Some(0),
+        );
         assert!(r.contains("2 entries"));
     }
 

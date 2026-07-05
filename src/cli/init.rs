@@ -96,8 +96,8 @@ fn verify_installation(agent: &str, global: bool) -> anyhow::Result<()> {
 }
 
 fn install_prompt_injection(agent: &str, global: bool) -> anyhow::Result<()> {
-    use crate::prompt;
     use crate::config::CavemanLevel;
+    use crate::prompt;
 
     let prompt = prompt::caveman_system_prompt(&CavemanLevel::Full);
 

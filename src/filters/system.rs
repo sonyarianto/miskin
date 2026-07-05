@@ -1,5 +1,5 @@
-use crate::filters::generic;
 use super::{CommandFilter, FilterResult};
+use crate::filters::generic;
 
 pub struct SystemFilter;
 
@@ -9,7 +9,9 @@ impl CommandFilter for SystemFilter {
     }
 
     fn aliases(&self) -> &[&str] {
-        &["df", "du", "ps", "top", "wc", "env", "which", "uname", "free"]
+        &[
+            "df", "du", "ps", "top", "wc", "env", "which", "uname", "free",
+        ]
     }
 
     fn filter(&self, _args: &[String], output: &str, _exit_code: Option<i32>) -> FilterResult {
@@ -28,8 +30,16 @@ mod unit_tests {
     use super::*;
     use crate::filters::CommandFilter;
 
-    fn run(filter: &dyn CommandFilter, subcommand: &str, output: &str, exit_code: Option<i32>) -> String {
-        let args: Vec<String> = subcommand.split_whitespace().map(|s| s.to_string()).collect();
+    fn run(
+        filter: &dyn CommandFilter,
+        subcommand: &str,
+        output: &str,
+        exit_code: Option<i32>,
+    ) -> String {
+        let args: Vec<String> = subcommand
+            .split_whitespace()
+            .map(|s| s.to_string())
+            .collect();
         match filter.filter(&args, output, exit_code) {
             FilterResult::Filtered(s) => s,
             FilterResult::PassThrough(s) => s,
@@ -47,7 +57,10 @@ mod unit_tests {
     #[test]
     fn long_output_truncated() {
         let f = SystemFilter;
-        let lines = (0..50).map(|i| format!("line {}", i)).collect::<Vec<_>>().join("\n");
+        let lines = (0..50)
+            .map(|i| format!("line {}", i))
+            .collect::<Vec<_>>()
+            .join("\n");
         let r = run(&f, "ps", &lines, Some(0));
         assert!(r.contains("lines omitted"));
     }

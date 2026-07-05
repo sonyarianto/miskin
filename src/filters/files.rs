@@ -1,5 +1,5 @@
-use crate::filters::generic;
 use super::{CommandFilter, FilterResult};
+use crate::filters::generic;
 
 pub struct FilesFilter;
 
@@ -34,7 +34,11 @@ fn filter_ls(output: &str) -> String {
         return "empty".to_string();
     }
 
-    if lines.first().map(|l| l.contains('/') || l.contains("total ")).unwrap_or(false) {
+    if lines
+        .first()
+        .map(|l| l.contains('/') || l.contains("total "))
+        .unwrap_or(false)
+    {
         let mut dirs = Vec::new();
         let mut files = Vec::new();
         let mut others = Vec::new();
@@ -70,7 +74,11 @@ fn filter_ls(output: &str) -> String {
 
         result.join("\n")
     } else {
-        format!("{} entries\n{}", lines.len(), generic::truncate_lines(output, 60))
+        format!(
+            "{} entries\n{}",
+            lines.len(),
+            generic::truncate_lines(output, 60)
+        )
     }
 }
 
@@ -90,11 +98,16 @@ fn filter_find(output: &str) -> String {
     if lines.len() <= 30 {
         return lines.join("\n");
     }
-    let prefix_grouped = generic::group_by_common_prefix(&lines.iter().map(|s| s.to_string()).collect::<Vec<_>>());
+    let prefix_grouped =
+        generic::group_by_common_prefix(&lines.iter().map(|s| s.to_string()).collect::<Vec<_>>());
     if prefix_grouped.len() < lines.len() / 2 {
         return prefix_grouped;
     }
-    format!("{} files\n{}", lines.len(), generic::truncate_lines(&lines.join("\n"), 60))
+    format!(
+        "{} files\n{}",
+        lines.len(),
+        generic::truncate_lines(&lines.join("\n"), 60)
+    )
 }
 
 #[cfg(test)]
@@ -102,8 +115,16 @@ mod unit_tests {
     use super::*;
     use crate::filters::CommandFilter;
 
-    fn run(filter: &dyn CommandFilter, subcommand: &str, output: &str, exit_code: Option<i32>) -> String {
-        let args: Vec<String> = subcommand.split_whitespace().map(|s| s.to_string()).collect();
+    fn run(
+        filter: &dyn CommandFilter,
+        subcommand: &str,
+        output: &str,
+        exit_code: Option<i32>,
+    ) -> String {
+        let args: Vec<String> = subcommand
+            .split_whitespace()
+            .map(|s| s.to_string())
+            .collect();
         match filter.filter(&args, output, exit_code) {
             FilterResult::Filtered(s) => s,
             FilterResult::PassThrough(s) => s,
@@ -128,7 +149,10 @@ mod unit_tests {
     #[test]
     fn cat_truncates_long() {
         let f = FilesFilter;
-        let lines = (0..200).map(|i| format!("line {}", i)).collect::<Vec<_>>().join("\n");
+        let lines = (0..200)
+            .map(|i| format!("line {}", i))
+            .collect::<Vec<_>>()
+            .join("\n");
         let r = run(&f, "cat", &lines, Some(0));
         assert!(r.contains("lines omitted"));
     }
@@ -144,12 +168,20 @@ mod unit_tests {
 fn filter_tree(output: &str) -> String {
     let lines: Vec<&str> = output.lines().collect();
     let dirs: Vec<&str> = lines.iter().filter(|l| l.contains('/')).copied().collect();
-    let files: Vec<&str> = lines.iter().filter(|l| !l.contains('/') && !l.contains("directories")).copied().collect();
+    let files: Vec<&str> = lines
+        .iter()
+        .filter(|l| !l.contains('/') && !l.contains("directories"))
+        .copied()
+        .collect();
 
     let mut result = Vec::new();
     result.push(format!("{} dirs, {} files", dirs.len(), files.len()));
 
-    let depth_0: Vec<&str> = lines.iter().filter(|l| l.starts_with("├── ") || l.starts_with("└── ")).copied().collect();
+    let depth_0: Vec<&str> = lines
+        .iter()
+        .filter(|l| l.starts_with("├── ") || l.starts_with("└── "))
+        .copied()
+        .collect();
     for d in depth_0.iter().take(30) {
         result.push((*d).to_string());
     }

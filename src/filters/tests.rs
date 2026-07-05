@@ -1,5 +1,5 @@
-use crate::filters::generic;
 use super::{CommandFilter, FilterResult};
+use crate::filters::generic;
 
 pub struct TestsFilter;
 
@@ -44,7 +44,12 @@ fn filter_pytest(output: &str, exit_code: Option<i32>) -> String {
             in_failure = true;
             let name = trimmed.split_whitespace().next().unwrap_or(trimmed);
             current_failure.push(name.to_string());
-        } else if in_failure && (trimmed.starts_with("E ") || trimmed.starts_with("> ") || trimmed.starts_with("AssertionError") || trimmed.starts_with("assert ")) {
+        } else if in_failure
+            && (trimmed.starts_with("E ")
+                || trimmed.starts_with("> ")
+                || trimmed.starts_with("AssertionError")
+                || trimmed.starts_with("assert "))
+        {
             current_failure.push(trimmed.to_string());
         } else if in_failure && trimmed.is_empty() {
             if !current_failure.is_empty() {
@@ -59,7 +64,11 @@ fn filter_pytest(output: &str, exit_code: Option<i32>) -> String {
         return format!("PASSED: {} tests", pass_count);
     }
 
-    let mut result = vec![format!("FAILED: {}/{}\n", fail_count, pass_count + fail_count)];
+    let mut result = vec![format!(
+        "FAILED: {}/{}\n",
+        fail_count,
+        pass_count + fail_count
+    )];
     for f in failures.iter().take(15) {
         result.push(f.clone());
     }
@@ -97,7 +106,10 @@ fn filter_jest(output: &str, _exit_code: Option<i32>) -> String {
     }
 
     if fail_count == 0 {
-        return format!("PASSED: {}/{} tests ({} suites)", pass_count, pass_count, suite_count);
+        return format!(
+            "PASSED: {}/{} tests ({} suites)",
+            pass_count, pass_count, suite_count
+        );
     }
 
     format!(
@@ -142,7 +154,10 @@ fn filter_rspec(output: &str, _exit_code: Option<i32>) -> String {
 
     for line in &lines {
         let trimmed = line.trim();
-        if trimmed.starts_with("Failures:") || trimmed.starts_with("Finished in") || trimmed.starts_with("examples") {
+        if trimmed.starts_with("Failures:")
+            || trimmed.starts_with("Finished in")
+            || trimmed.starts_with("examples")
+        {
             found_summary = true;
         }
         if found_summary {
@@ -199,7 +214,9 @@ fn filter_generic(output: &str, exit_code: Option<i32>) -> String {
     let lines: Vec<&str> = output.lines().collect();
     let failures: Vec<&str> = lines
         .iter()
-        .filter(|l| l.contains("FAIL") || l.contains("fail") || l.contains("error") || l.contains("Error"))
+        .filter(|l| {
+            l.contains("FAIL") || l.contains("fail") || l.contains("error") || l.contains("Error")
+        })
         .copied()
         .collect();
 
@@ -214,8 +231,16 @@ mod unit_tests {
     use super::*;
     use crate::filters::CommandFilter;
 
-    fn run(filter: &dyn CommandFilter, subcommand: &str, output: &str, exit_code: Option<i32>) -> String {
-        let args: Vec<String> = subcommand.split_whitespace().map(|s| s.to_string()).collect();
+    fn run(
+        filter: &dyn CommandFilter,
+        subcommand: &str,
+        output: &str,
+        exit_code: Option<i32>,
+    ) -> String {
+        let args: Vec<String> = subcommand
+            .split_whitespace()
+            .map(|s| s.to_string())
+            .collect();
         match filter.filter(&args, output, exit_code) {
             FilterResult::Filtered(s) => s,
             FilterResult::PassThrough(s) => s,
@@ -226,20 +251,30 @@ mod unit_tests {
     #[test]
     fn pytest_all_pass() {
         let f = TestsFilter;
-        let result = run(&f, "pytest", "\
+        let result = run(
+            &f,
+            "pytest",
+            "\
 tests/test_foo.py::test_one PASSED
 tests/test_foo.py::test_two PASSED
-========================= 2 passed in 0.42s =========================", Some(0));
+========================= 2 passed in 0.42s =========================",
+            Some(0),
+        );
         assert!(result.contains("PASSED: 2 tests"));
     }
 
     #[test]
     fn jest_pass() {
         let f = TestsFilter;
-        let result = run(&f, "jest", "\
+        let result = run(
+            &f,
+            "jest",
+            "\
 PASS  src/__tests__/foo.test.ts
 PASS  src/__tests__/bar.test.ts
-Tests: 5 passed, 5 total", Some(0));
+Tests: 5 passed, 5 total",
+            Some(0),
+        );
         assert!(result.contains("PASSED:"));
     }
 

@@ -47,9 +47,7 @@ export default {
             .join("plugins")
             .join("miskin.ts")
     } else {
-        PathBuf::from(".opencode")
-            .join("plugins")
-            .join("miskin.ts")
+        PathBuf::from(".opencode").join("plugins").join("miskin.ts")
     };
 
     if let Some(parent) = path.parent() {
@@ -68,9 +66,7 @@ pub fn uninstall(global: bool) -> anyhow::Result<()> {
             .join("plugins")
             .join("miskin.ts")
     } else {
-        PathBuf::from(".opencode")
-            .join("plugins")
-            .join("miskin.ts")
+        PathBuf::from(".opencode").join("plugins").join("miskin.ts")
     };
     if path.exists() {
         std::fs::remove_file(&path)?;
