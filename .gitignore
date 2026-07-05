@@ -1,0 +1,10 @@
+/target/
+**/*.rs.bk
+.DS_Store
+.claude/
+.cursor/
+.codex/
+.gemini/
+.opencode/
+.github/
+.miskin/
