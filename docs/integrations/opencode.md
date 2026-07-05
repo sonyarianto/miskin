@@ -16,23 +16,21 @@ miskin init -g --agent opencode       # Global
 
 ## How the hook works
 
-The TypeScript plugin intercepts tool executions:
+OpenCode auto-loads TypeScript plugins from `.opencode/plugins/`. The plugin intercepts `tool.execute.before` and rewrites bash commands:
 
 ```ts
-export default {
-  name: "miskin",
-  hooks: {
-    "tool.execute.before": async (tool) => {
-      if (["bash", "shell", "execute"].includes(tool.name)) {
-        const cmd = tool.input?.command || tool.input?.cmd || "";
+export const MiskinPlugin = async (ctx) => {
+  return {
+    "tool.execute.before": async (input, output) => {
+      if (input.tool === "bash") {
+        const cmd = output.args.command || "";
         const base = cmd.trim().split(/\s+/)[0];
-        if (["git", "cargo", "npm", ...].includes(base)) {
-          tool.input.command = `miskin ${cmd}`;
+        if (SUPPORTED.includes(base)) {
+          output.args.command = `miskin ${cmd}`;
         }
       }
-      return tool;
-    }
-  }
+    },
+  };
 };
 ```
 
