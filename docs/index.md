@@ -4,7 +4,7 @@ layout: home
 hero:
   name: "Miskin"
   text: "Save AI tokens."
-  tagline: Single Rust binary. Zero dependencies. 60-90% fewer tokens on dev commands, 65% fewer on LLM responses.
+  tagline: Cut your AI coding costs. Same results, fewer tokens. Just one binary.
   actions:
     - theme: brand
       text: Get Started
