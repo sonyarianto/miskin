@@ -51,18 +51,18 @@ miskin cargo test          # failures only
 miskin docker ps           # compact table
 ```
 
-## Token Savings
+## Approximate Savings
 
-| Command | Raw | Miskin | Saved |
-|---------|-----|--------|-------|
-| `git status` | ~2,000 | ~200 | **90%** |
-| `cargo test` | ~5,000 | ~500 | **90%** |
-| `git diff` | ~1,000 | ~300 | **70%** |
-| `eslint` | ~2,000 | ~400 | **80%** |
-| `docker ps` | ~500 | ~100 | **80%** |
-| `npm install` | ~1,000 | ~50 | **95%** |
+> **Note**: Rough projections, not benchmarks. Your numbers will vary. Run `miskin stats` to see real savings.
 
-Estimates for medium-sized projects. Actual savings vary.
+| Command | Typical raw | With Miskin | Approx. |
+|---------|-------------|-------------|---------|
+| `git status` | up to ~2,000 | ~200 | ~90% |
+| `cargo test` | up to ~5,000 | ~500 | ~90% |
+| `git diff` | up to ~1,000 | ~300 | ~70% |
+| `eslint` | up to ~2,000 | ~400 | ~80% |
+| `docker ps` | ~500 | ~100 | ~80% |
+| `npm install` | ~1,000 | ~50 | ~95% |
 
 ## How It Works
 

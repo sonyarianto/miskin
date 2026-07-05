@@ -132,20 +132,22 @@ miskin completions fish > ~/.config/fish/completions/miskin.fish
 | **Network** | curl, wget |
 | **System** | df, du, ps, top, wc, env, which, uname, free |
 
-## Token Savings
+## Approximate Savings
 
-| Command | Raw | Miskin | Saved |
-|---------|-----|--------|-------|
-| `git status` | ~800 | ~150 | 81% |
-| `git diff` | ~1000 | ~300 | 70% |
-| `git push` | ~200 | ~20 | 90% |
-| `cargo test` | ~5000 | ~500 | 90% |
-| `ls -la` | ~400 | ~100 | 75% |
-| `docker ps` | ~500 | ~100 | 80% |
-| `eslint` | ~2000 | ~400 | 80% |
-| `npm install` | ~1000 | ~50 | 95% |
+> **Note**: These are rough projections based on typical output sizes, not measured benchmarks. Actual savings depend on project size, command flags, and output length. Run `miskin stats` to see your real numbers.
 
-Estimates for medium-sized projects. Actual savings vary.
+| Command | Typical raw | With Miskin | Approx. saved |
+|---------|-------------|-------------|---------------|
+| `git status` | up to ~2,000 | ~200 | ~90% |
+| `git diff` | up to ~1,000 | ~300 | ~70% |
+| `git push` | ~200 | ~20 | ~90% |
+| `cargo test` | up to ~5,000 | ~500 | ~90% |
+| `ls -la` | ~400 | ~100 | ~75% |
+| `docker ps` | ~500 | ~100 | ~80% |
+| `eslint` | up to ~2,000 | ~400 | ~80% |
+| `npm install` | ~1,000 | ~50 | ~95% |
+
+Run `miskin stats` to see your actual numbers.
 
 ## Caveman Modes
 
